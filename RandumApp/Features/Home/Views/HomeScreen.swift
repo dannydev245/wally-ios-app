@@ -8,9 +8,13 @@
 import SwiftUI
 
 struct HomeScreen: View {
+    @State private var currentUser: User? = nil
+    
     var body: some View {
         Text("HomeScreen")
     }
+    
+    
 }
 
 #Preview {

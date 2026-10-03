@@ -6,3 +6,19 @@
 //
 
 import Foundation
+
+extension UserDefaults {
+    var savedUser: User? {
+        get {
+            guard let data = data(forKey: AppStorageKeys.currentUser) else { return nil }
+            return try? JSONDecoder().decode(User.self, from: data)
+        }
+        set {
+            if let newValue = newValue, let encoded = try? JSONEncoder().encode(newValue) {
+                set(encoded, forKey: AppStorageKeys.currentUser)
+            } else {
+                removeObject(forKey: AppStorageKeys.currentUser)
+            }
+        }
+    }
+}

@@ -2,7 +2,6 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var currentUser: User? = nil
-    //    nil | User(id: 1, email: "abc@gmail.com")
     
     var body: some View {
         Group {
@@ -21,10 +20,7 @@ struct ContentView: View {
     }
     
     private func loadCurrentUser(){
-        if let savedData = UserDefaults.standard.data(forKey: "currentUser"),
-           let decodedUser = try? JSONDecoder().decode(User.self, from: savedData) {
-            self.currentUser = decodedUser
-        }
+        self.currentUser = UserDefaults.standard.savedUser
     }
 }
 

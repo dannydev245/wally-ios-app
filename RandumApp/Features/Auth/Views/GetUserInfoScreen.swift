@@ -179,9 +179,7 @@ struct GetUserInfoScreen: View {
             gender: selectedGender
         )
         
-        if let encoded = try? JSONEncoder().encode(newUser) {
-            UserDefaults.standard.set(encoded, forKey: "currentUser")
-        }
+        UserDefaults.standard.savedUser = newUser
         
         onComplete(newUser)
     }
