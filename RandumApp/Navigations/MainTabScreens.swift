@@ -10,14 +10,22 @@ import SwiftUI
 struct MainTabScreens: View {
     var body: some View {
         TabView {
-            // Tab 1: Ví dụ màn Home
-            Text("Home Screen (Tab 1)")
+            HomeScreen()
                 .tabItem {
                     Label("Home", systemImage: "house.fill")
                 }
             
-            // Tab 2: Ví dụ màn Profile / Settings
-            Text("Profile Screen (Tab 2)")
+            TransactionsScreen()
+                .tabItem {
+                    Label("Transactions", systemImage: "list.bullet.rectangle.portrait.fill")
+                }
+            
+            AnalyzeScreen()
+                .tabItem {
+                    Label("Analyze", systemImage: "chart.pie.fill")
+                }
+            
+            ProfileScreen()
                 .tabItem {
                     Label("Profile", systemImage: "person.fill")
                 }
