@@ -76,7 +76,7 @@ struct WelcomeScreen: View {
                 VStack(alignment: .center, spacing: 14) {
                     Spacer().frame(height: 4)
                     
-                    Text("Expense Tracker")
+                    Text("Wally")
                         .font(.system(size: 30, weight: .heavy))
                         .tracking(2)
                         .foregroundStyle(AppColors.primary)

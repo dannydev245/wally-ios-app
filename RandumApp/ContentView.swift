@@ -6,11 +6,9 @@ struct ContentView: View {
     var body: some View {
         Group {
             if currentUser == nil {
-                AuthStackScreens { user in
-                    self.currentUser = user
-                }
+                AuthStackScreens(onUserAuthenticated: login)
             } else {
-                MainTabScreens()
+                MainTabScreens(onLogout: logout)
             }
         }
         .tint(AppColors.primary)
@@ -21,6 +19,19 @@ struct ContentView: View {
     
     private func loadCurrentUser(){
         self.currentUser = UserDefaults.standard.savedUser
+    }
+    
+    private func login(_ newUser: User) {
+        withAnimation {
+            self.currentUser = newUser
+        }
+    }
+    
+    private func logout() {
+        UserDefaults.standard.savedUser = nil
+        withAnimation {
+            self.currentUser = nil
+        }
     }
 }
 

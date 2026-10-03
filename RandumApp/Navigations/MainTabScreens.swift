@@ -8,32 +8,53 @@
 import SwiftUI
 
 struct MainTabScreens: View {
+    var onLogout: () -> Void
+
+    @State private var currentUser: User? = nil
+    
     var body: some View {
-        TabView {
-            HomeScreen()
-                .tabItem {
-                    Label("Home", systemImage: "house.fill")
+        Group{
+            if let user = currentUser {
+                TabView {
+                    HomeScreen(user: user)
+                        .id("home")
+                        .tabItem {
+                            Label("Home", systemImage: "house.fill")
+                        }
+                    
+                    TransactionsScreen()
+                        .id("transactions")
+                        .tabItem {
+                            Label("Transactions", systemImage: "list.bullet.rectangle.portrait.fill")
+                        }
+                    
+                    AnalyzeScreen()
+                        .id("analyze")
+                        .tabItem {
+                            Label("Analyze", systemImage: "chart.pie.fill")
+                        }
+                    
+                    ProfileScreen(onLogout: onLogout)
+                        .id("profile")
+                        .tabItem {
+                            Label("Profile", systemImage: "person.fill")
+                        }
                 }
-            
-            TransactionsScreen()
-                .tabItem {
-                    Label("Transactions", systemImage: "list.bullet.rectangle.portrait.fill")
-                }
-            
-            AnalyzeScreen()
-                .tabItem {
-                    Label("Analyze", systemImage: "chart.pie.fill")
-                }
-            
-            ProfileScreen()
-                .tabItem {
-                    Label("Profile", systemImage: "person.fill")
-                }
+                .tint(AppColors.primary)
+            } else {
+                ProgressView()
+            }
         }
-        .tint(AppColors.primary)
+        .onAppear {
+            if let savedUser = UserDefaults.standard.savedUser {
+                self.currentUser = savedUser
+            } else {
+                onLogout()
+            }
+        }
     }
 }
 
 #Preview {
-    MainTabScreens()
+    MainTabScreens(onLogout: {print("1")})
 }

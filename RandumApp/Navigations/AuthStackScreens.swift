@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct AuthStackScreens: View {
-    @State private var authPath: [AuthRoute] = []
     var onUserAuthenticated: (User) -> Void
+
+    @State private var authPath: [AuthRoute] = []
     
     var body: some View {
         NavigationStack(path: $authPath) {

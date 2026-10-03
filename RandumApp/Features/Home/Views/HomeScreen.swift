@@ -8,15 +8,16 @@
 import SwiftUI
 
 struct HomeScreen: View {
-    @State private var currentUser: User? = nil
+    @StateObject private var viewModel: HomeViewModel
     
-    var body: some View {
-        Text("HomeScreen")
+    init(user: User) {
+        _viewModel = StateObject(wrappedValue: HomeViewModel(user: user))
     }
     
-    
-}
-
-#Preview {
-    HomeScreen()
+    var body: some View {
+        VStack{
+            Text("eyo wassup ku")
+            Text("Xin chào, \(viewModel.currentUser.name)!")
+        }
+    }
 }
