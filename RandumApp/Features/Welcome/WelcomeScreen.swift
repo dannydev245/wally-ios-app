@@ -86,15 +86,12 @@ struct WelcomeScreen: View {
                         .foregroundStyle(AppColors.textPrimary)
                         .multilineTextAlignment(.center)
                     
-                    Text(
-                        "Track your spending, manage your budget, " +
-                        "and build better financial habits."
-                    )
-                    .font(.system(size: 15))
-                    .foregroundStyle(AppColors.textSecondary)
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(5)
-                    .padding(.horizontal, 12)
+                    Text("Track your spending, manage your budget, and build better financial habits.")
+                        .font(.system(size: 15))
+                        .foregroundStyle(AppColors.textSecondary)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(5)
+                        .padding(.horizontal, 12)
                     
                     Spacer()
                     
@@ -110,22 +107,16 @@ struct WelcomeScreen: View {
                 }
                 .padding(.horizontal, 28)
                 .padding(.top, 24)
-                .padding(.bottom, 24)
+                .padding(.bottom, 36)
                 .frame(width: geometry.size.width, height: screenHeight * 0.42)
-                .background(.white)
-                .clipShape(
-                    UnevenRoundedRectangle(
-                        topLeadingRadius: 36,
-                        bottomLeadingRadius: 0,
-                        bottomTrailingRadius: 0,
-                        topTrailingRadius: 36
-                    )
+                .background(
+                    Color(.systemBackground)
+                        .cornerRadiusTop(36)
                 )
                 .offset(y: screenHeight * 0.58)
             }
         }
-        .ignoresSafeArea(.all, edges: .top)
-        .toolbar(.hidden, for: .navigationBar)
+        .ignoresSafeArea(.all)
     }
 }
 

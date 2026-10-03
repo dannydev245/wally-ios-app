@@ -10,38 +10,60 @@ import SwiftUI
 struct PasswordField: View {
     let title: String
     @Binding var password: String
+    var systemImage: String? = "lock"
+    var isNewPassword: Bool = false
     var isDisabled: Bool = false
     
     @State private var isVisible = false
     
     var body: some View {
         HStack(spacing: 12){
-            Group {
-                if isVisible {
-                    TextField(title, text: $password)
-                } else {
-                    SecureField(title, text: $password)
-                }
+            // Leading Icon
+            if let systemImage = systemImage {
+                Image(systemName: systemImage)
+                    .font(.system(size: 16))
+                    .foregroundStyle(isDisabled ? AppColors.textSecondary.opacity(0.6) : AppColors.textSecondary)
+                    .frame(width: 20)
             }
-            .font(.system(size: 14))
-            .textContentType(.newPassword)
-            .autocorrectionDisabled()
-            .disabled(isDisabled)
             
-            Button{
+            // Password Input Area
+            ZStack(alignment: .leading) {
+                // Placeholder
+                if password.isEmpty {
+                    Text(title)
+                        .font(.system(size: 15))
+                        .foregroundStyle(AppColors.textSecondary)
+                }
+                
+                SecureField("", text: $password)
+                    .font(.system(size: 15))
+                    .foregroundStyle(isDisabled ? AppColors.textSecondary : AppColors.textPrimary)
+                    .textContentType(isNewPassword ? .newPassword : .password)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
+                    .disabled(isDisabled)
+                    .opacity(isVisible ? 0 : 1)
+                
+                TextField("", text: $password)
+                    .font(.system(size: 15))
+                    .foregroundStyle(isDisabled ? AppColors.textSecondary : AppColors.textPrimary)
+                    .textContentType(isNewPassword ? .newPassword : .password)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
+                    .disabled(isDisabled)
+                    .opacity(isVisible ? 1 : 0)
+            }
+            
+            // Toggle hide/show Password
+            Button {
                 isVisible.toggle()
             } label: {
-                Image(
-                    systemName: isVisible
-                    ? "eye"
-                    : "eye.slash"
-                )
-                .foregroundStyle(AppColors.textSecondary)
+                Image(systemName: isVisible ? "eye" : "eye.slash")
+                    .font(.system(size: 16))
+                    .foregroundStyle(AppColors.textSecondary)
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel(
-                isVisible ? "Hide password" : "Show password"
-            )
+            .buttonStyle(AppPressableButtonStyle())
+            .accessibilityLabel(isVisible ? "Hide password" : "Show password")
             .disabled(isDisabled)
         }
         .padding(.horizontal, 18)
@@ -52,15 +74,17 @@ struct PasswordField: View {
             : AppColors.inputBackground
         )
         .clipShape(Capsule())
-        .foregroundColor(isDisabled ? AppColors.textSecondary : AppColors.textPrimary)
     }
 }
 
 #Preview {
-    @Previewable @State var sampleText = ""
+    @Previewable @State var password = ""
+    @Previewable @State var disabledPassword = "secretPassword123"
     
-    VStack {
-        PasswordField(title: "Enter here...", password: $sampleText)
+    VStack(spacing: 16) {
+        PasswordField(title: "Password", password: $password)
+        PasswordField(title: "Disabled Password", password: $disabledPassword, isDisabled: true)
     }
     .padding()
+    .background(AppColors.background)
 }

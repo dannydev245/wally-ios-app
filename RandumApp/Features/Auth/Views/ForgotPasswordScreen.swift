@@ -8,15 +8,11 @@
 import SwiftUI
 
 struct ForgotPasswordScreen: View {
-    let onGoToSignIn: () -> Void
+//    let onGoToSignIn: () -> Void
     var body: some View {
         Text("ForgotPasswordScreen")
-        Button("onGoToSignIn") {
-            onGoToSignIn()
-        }
+//        Button("onGoToSignIn") {
+//            onGoToSignIn()
+//        }
     }
-}
-
-#Preview {
-//    ForgotPasswordScreen()
 }

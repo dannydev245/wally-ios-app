@@ -8,19 +8,15 @@
 import SwiftUI
 
 struct SignInScreen: View {
-    var onNavigate: (AuthRoute) -> Void
+//    var onNavigate: (AuthRoute) -> Void
     
     var body: some View {
         Text("SignInScreen")
-        Button("onNavigate forgotPassword") {
-            onNavigate(.forgotPassword)
-        }
-        Button("onNavigate signUp") {
-            onNavigate(.signUp)
-        }
+//        Button("onNavigate forgotPassword") {
+//            onNavigate(.forgotPassword)
+//        }
+//        Button("onNavigate signUp") {
+//            onNavigate(.signUp)
+//        }
     }
-}
-
-#Preview {
-//    SignInScreen()
 }

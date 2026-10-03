@@ -35,7 +35,7 @@ struct AppButton: View {
                 Text(title)
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(.white)
-                    .opacity(isLoading ? 0 : 1)
+                    .opacity(isLoading ? 0 : (isDisabled ? 0.7 : 1))
                 
                 if isLoading {
                     ProgressView()
@@ -46,13 +46,13 @@ struct AppButton: View {
             .frame(height: 54)
             .background(
                 isButtonDisabled
-                ? AppColors.primary.opacity(0.5)
+                ? AppColors.primary.opacity(0.4)
                 : AppColors.primary
             )
             .clipShape(Capsule())
         }
         .disabled(isButtonDisabled)
-        .buttonStyle(.plain)
+        .buttonStyle(AppPressableButtonStyle())
     }
 }
 

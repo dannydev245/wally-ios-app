@@ -8,9 +8,9 @@
 import SwiftUI
 
 enum AppColors {
-    static let primary = Color("MintBright")
+    static let primary = Color("AppPrimary")
     static let background = Color("AppBackground")
     static let inputBackground = Color("AppInputBackground")
     static let textPrimary = Color("TextPrimary")
-    static let textSecondary = Color("SteelBlue")
+    static let textSecondary = Color("TextSecondary")
 }

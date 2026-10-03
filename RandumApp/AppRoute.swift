@@ -9,14 +9,16 @@ import Foundation
 
 enum AuthRoute: Hashable {
     case welcome
-    case signIn
-    case signUp
-    case forgotPassword
+    case getUserInfo
+//    case signIn
+//    case signUp
+//    case forgotPassword
 }
 
 enum MainRoute: Hashable {
-    //        case profileDetail(userId: String)
     case home
+    case transaction
+    case analyze
     case profile
 }
 

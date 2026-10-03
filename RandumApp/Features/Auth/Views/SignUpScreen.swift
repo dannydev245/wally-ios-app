@@ -8,16 +8,12 @@
 import SwiftUI
 
 struct SignUpScreen: View {
-    let onGoToSignIn: () -> Void
+//    let onGoToSignIn: () -> Void
     
     var body: some View {
         Text("SignUpScreen")
-        Button("onGoToSignIn") {
-            onGoToSignIn()
-        }
+//        Button("onGoToSignIn") {
+//            onGoToSignIn()
+//        }
     }
-}
-
-#Preview {
-//    SignUpScreen()
 }
