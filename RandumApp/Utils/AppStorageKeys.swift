@@ -10,5 +10,6 @@ import Foundation
 
 enum AppStorageKeys {
     static let currentUser = "currentUser"
+    static let userTransaction = "userTransaction"
     static let appTheme = "appTheme"
 }

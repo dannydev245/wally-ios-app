@@ -21,3 +21,7 @@ struct HomeScreen: View {
         }
     }
 }
+
+#Preview {
+    HomeScreen(user: User(id: UUID(), name: "Duy Hoang Thanh", age: 22, gender: .male))
+}

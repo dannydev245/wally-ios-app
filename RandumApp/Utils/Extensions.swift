@@ -21,4 +21,18 @@ extension UserDefaults {
             }
         }
     }
+    
+    var savedTransactions: [TransactionItem] {
+        get {
+            guard let data = data(forKey: AppStorageKeys.userTransaction) else { return [] }
+            return (try? JSONDecoder().decode([TransactionItem].self, from: data)) ?? []
+        }
+        set {
+            if let encoded = try? JSONEncoder().encode(newValue) {
+                set(encoded, forKey: AppStorageKeys.userTransaction)
+            } else {
+                removeObject(forKey: AppStorageKeys.userTransaction)
+            }
+        }
+    }
 }
