@@ -90,7 +90,7 @@ struct DraggableFAB: View {
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             .padding(.trailing, 20)
-            .padding(.bottom, 20)
+            .padding(.bottom, 55)
         }
     }
 }

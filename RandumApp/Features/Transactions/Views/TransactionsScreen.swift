@@ -158,12 +158,6 @@ struct TransactionsScreen: View {
                     .scrollContentBackground(.hidden)
                     .environment(\.defaultMinListHeaderHeight, 0)
                 }
-                
-                // MARK: - Floating Add Button
-                DraggableFAB {
-                    viewModel.editingTransaction = nil
-                    viewModel.showFormSheet = true
-                }
             }
             .navigationTitle("Transactions")
             .navigationBarTitleDisplayMode(.inline)
@@ -181,13 +175,11 @@ struct TransactionsScreen: View {
                             category: category
                         )
                         viewModel.updateTransaction(updated)
-                    } else {
-                        viewModel.addTransaction(title: title, amount: amount, date: date, type: type, category: category)
                     }
                 }
                 .presentationDetents([.fraction(0.68), .large])
                 .presentationDragIndicator(.visible)
-//                .presentationDetents([.height(520)])
+                //                .presentationDetents([.height(520)])
             }
         }
     }

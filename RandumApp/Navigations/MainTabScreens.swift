@@ -12,52 +12,78 @@ struct MainTabScreens: View {
     
     @State private var selectedTab: MainAppTab = .home
     @State private var currentUser: User? = nil
+    @State private var showCreateSheet: Bool = false
     
     @StateObject private var transactionsViewModel = TransactionsViewModel()
     
     var body: some View {
         Group{
             if let user = currentUser {
-                TabView(selection: $selectedTab) {
-                    HomeScreen(
-                        user: user,
-                        transactionsViewModel: transactionsViewModel,
-                        onSeeAllTapped: {
-                            selectedTab = .transactions
+                ZStack(alignment: .bottomTrailing){
+                    
+                    
+                    TabView(selection: $selectedTab) {
+                        HomeScreen(
+                            user: user,
+                            transactionsViewModel: transactionsViewModel,
+                            onSeeAllTapped: {
+                                selectedTab = .transactions
+                            }
+                        )
+                        .id("home")
+                        .tabItem {
+                            Label("Home", systemImage: "house.fill")
                         }
-                    )
-                    .id("home")
-                    .tabItem {
-                        Label("Home", systemImage: "house.fill")
-                    }
-                    .tag(MainAppTab.home)
-                    
-                    TransactionsScreen(
-                        viewModel: transactionsViewModel
-                    )
-                    .id("transactions")
-                    .tabItem {
-                        Label("Transactions", systemImage: "list.bullet.rectangle.portrait.fill")
-                    }
-                    .tag(MainAppTab.transactions)
-                    
-                    AnalyzeScreen(
-                        transactionsViewModel: transactionsViewModel
-                    )
+                        .tag(MainAppTab.home)
+                        
+                        TransactionsScreen(
+                            viewModel: transactionsViewModel
+                        )
+                        .id("transactions")
+                        .tabItem {
+                            Label("Transactions", systemImage: "list.bullet.rectangle.portrait.fill")
+                        }
+                        .tag(MainAppTab.transactions)
+                        
+                        AnalyzeScreen(
+                            transactionsViewModel: transactionsViewModel
+                        )
                         .id("analyze")
                         .tabItem {
                             Label("Analyze", systemImage: "chart.pie.fill")
                         }
                         .tag(MainAppTab.analyze)
+                        
+                        ProfileScreen(onLogout: onLogout)
+                            .id("profile")
+                            .tabItem {
+                                Label("Profile", systemImage: "person.fill")
+                            }
+                            .tag(MainAppTab.profile)
+                    }
+                    .tint(AppColors.primary)
                     
-                    ProfileScreen(onLogout: onLogout)
-                        .id("profile")
-                        .tabItem {
-                            Label("Profile", systemImage: "person.fill")
+                    if selectedTab == .home || selectedTab == .transactions {
+                        DraggableFAB {
+                            showCreateSheet = true
                         }
-                        .tag(MainAppTab.profile)
+                        .transition(.scale.combined(with: .opacity))
+                    }
                 }
-                .tint(AppColors.primary)
+                .sheet(isPresented: $showCreateSheet) {
+                    TransactionFormSheet(transactionToEdit: nil) { title, amount, date, type, category in
+                        transactionsViewModel.addTransaction(
+                            title: title,
+                            amount: amount,
+                            date: date,
+                            type: type,
+                            category: category
+                        )
+                    }
+                    .presentationDetents([.fraction(0.68), .large])
+                    .presentationDragIndicator(.visible)
+                }
+                
             } else {
                 ProgressView()
             }

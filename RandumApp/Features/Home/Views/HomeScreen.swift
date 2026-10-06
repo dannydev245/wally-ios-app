@@ -12,7 +12,6 @@ struct HomeScreen: View {
     @StateObject private var viewModel: HomeViewModel
     @ObservedObject var transactionsViewModel: TransactionsViewModel
     
-    @State private var showCreateSheet: Bool = false
     var onSeeAllTapped: () -> Void
     
     init(
@@ -239,11 +238,6 @@ struct HomeScreen: View {
                     }
                     .padding(.horizontal, 12)
                 }
-                
-                // MARK: - Floating Action Button (FAB)
-                DraggableFAB {
-                    showCreateSheet = true
-                }
             }
             .navigationBarHidden(true)
             .onAppear {
@@ -251,19 +245,6 @@ struct HomeScreen: View {
             }
             .onChange(of: transactionsViewModel.transactions) { oldValue, newValue in
                 viewModel.updateData(from: newValue)
-            }
-            .sheet(isPresented: $showCreateSheet) {
-                TransactionFormSheet(transactionToEdit: nil) { title, amount, date, type, category in
-                    transactionsViewModel.addTransaction(
-                        title: title,
-                        amount: amount,
-                        date: date,
-                        type: type,
-                        category: category
-                    )
-                }
-                .presentationDetents([.fraction(0.7), .large])
-                .presentationDragIndicator(.visible)
             }
         }
     }

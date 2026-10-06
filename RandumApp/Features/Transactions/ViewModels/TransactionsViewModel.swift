@@ -26,7 +26,7 @@ class TransactionsViewModel: ObservableObject {
     @Published var selectedTypeFilter: TransactionFilterType = .all
     @Published var selectedDateRange: DateRangeFilter = .all
     
-    // Manage Modal Create / Edit
+    // Manage Modal Edit
     @Published var showFormSheet: Bool = false
     @Published var editingTransaction: TransactionItem? = nil
     
