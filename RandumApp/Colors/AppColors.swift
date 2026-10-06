@@ -13,4 +13,6 @@ enum AppColors {
     static let inputBackground = Color("AppInputBackground")
     static let textPrimary = Color("TextPrimary")
     static let textSecondary = Color("TextSecondary")
+    static let greenEmerald = Color("GreenEmerald")
+    static let redBright = Color("RedBright")
 }

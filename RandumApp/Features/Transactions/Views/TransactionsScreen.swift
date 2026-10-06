@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TransactionsScreen: View {
-    @StateObject private var viewModel = TransactionsViewModel()
+    @ObservedObject var viewModel: TransactionsViewModel
     
     var body: some View {
         NavigationStack {
@@ -119,7 +119,6 @@ struct TransactionsScreen: View {
                                 Section {
                                     ForEach(group.items) { tx in
                                         TransactionRowView(transaction: tx)
-                                            .padding(.horizontal, 12)
                                             .padding(.vertical, 6)
                                             .listRowInsets(EdgeInsets())
                                             .listRowBackground(Color.clear)
@@ -151,21 +150,22 @@ struct TransactionsScreen: View {
                                     EmptyView()
                                 }
                                 .listSectionSeparator(.hidden)
+                                .padding(.horizontal, 12)
                             }
                         }
                     }
                     .listStyle(.plain)
                     .scrollContentBackground(.hidden)
-//                    .environment(\.defaultMinListHeaderHeight, 0)
+                    .environment(\.defaultMinListHeaderHeight, 0)
                 }
                 
-                // MARK: - Floating Add (+) Button
+                // MARK: - Floating Add Button
                 Button {
                     viewModel.editingTransaction = nil
                     viewModel.showFormSheet = true
                 } label: {
                     Image(systemName: "plus")
-                        .font(.system(size: 22, weight: .bold))
+                        .font(.system(size: 24, weight: .bold))
                         .foregroundStyle(.white)
                         .frame(width: 58, height: 58)
                         .background(AppColors.primary)
@@ -173,7 +173,7 @@ struct TransactionsScreen: View {
                         .shadow(color: AppColors.primary.opacity(0.4), radius: 8, y: 4)
                 }
                 .padding(.trailing, 20)
-                .padding(.bottom, 40)
+                .padding(.bottom, 20)
             }
             .navigationTitle("Transactions")
             .navigationBarTitleDisplayMode(.inline)
@@ -204,5 +204,7 @@ struct TransactionsScreen: View {
 }
 
 #Preview {
-    TransactionsScreen()
+    TransactionsScreen(
+        viewModel: TransactionsViewModel(),
+    )
 }

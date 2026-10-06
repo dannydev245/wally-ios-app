@@ -23,4 +23,15 @@ struct User: Identifiable, Codable, Equatable {
     var name: String
     var age: Int
     var gender: Gender
+    
+    var avatarIconName: String {
+        switch gender {
+        case .male:
+            return "figure.stand"
+        case .female:
+            return "figure.stand.dress"
+        case .other:
+            return "person.fill"
+        }
+    }
 }

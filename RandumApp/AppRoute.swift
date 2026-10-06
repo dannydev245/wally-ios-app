@@ -26,3 +26,10 @@ enum AppRoute: Hashable {
     case auth(AuthRoute)
     case main(MainRoute)
 }
+
+enum MainAppTab: Int {
+    case home = 0
+    case transactions = 1
+    case analyze = 2
+    case profile = 3
+}

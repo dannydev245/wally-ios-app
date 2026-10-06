@@ -9,36 +9,51 @@ import SwiftUI
 
 struct MainTabScreens: View {
     var onLogout: () -> Void
-
+    
     @State private var currentUser: User? = nil
+    
+    @StateObject private var transactionsViewModel = TransactionsViewModel()
+    @State private var selectedTab: MainAppTab = .home
     
     var body: some View {
         Group{
             if let user = currentUser {
-                TabView {
-                    HomeScreen(user: user)
-                        .id("home")
-                        .tabItem {
-                            Label("Home", systemImage: "house.fill")
+                TabView(selection: $selectedTab) {
+                    HomeScreen(
+                        user: user,
+                        transactionsViewModel: transactionsViewModel,
+                        onSeeAllTapped: {
+                            selectedTab = .transactions
                         }
+                    )
+                    .id("home")
+                    .tabItem {
+                        Label("Home", systemImage: "house.fill")
+                    }
+                    .tag(MainAppTab.home)
                     
-                    TransactionsScreen()
-                        .id("transactions")
-                        .tabItem {
-                            Label("Transactions", systemImage: "list.bullet.rectangle.portrait.fill")
-                        }
+                    TransactionsScreen(
+                        viewModel: transactionsViewModel
+                    )
+                    .id("transactions")
+                    .tabItem {
+                        Label("Transactions", systemImage: "list.bullet.rectangle.portrait.fill")
+                    }
+                    .tag(MainAppTab.transactions)
                     
                     AnalyzeScreen()
                         .id("analyze")
                         .tabItem {
                             Label("Analyze", systemImage: "chart.pie.fill")
                         }
+                        .tag(MainAppTab.analyze)
                     
                     ProfileScreen(onLogout: onLogout)
                         .id("profile")
                         .tabItem {
                             Label("Profile", systemImage: "person.fill")
                         }
+                        .tag(MainAppTab.profile)
                 }
                 .tint(AppColors.primary)
             } else {
