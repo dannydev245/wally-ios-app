@@ -20,8 +20,6 @@ struct MainTabScreens: View {
         Group{
             if let user = currentUser {
                 ZStack(alignment: .bottomTrailing){
-                    
-                    
                     TabView(selection: $selectedTab) {
                         HomeScreen(
                             user: user,
