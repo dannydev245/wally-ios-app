@@ -12,19 +12,20 @@ struct DraggableFAB: View {
     
     private let buttonSize: CGFloat = 58
     
-    @State private var position: CGPoint = .zero
-    @State private var isInitialized: Bool = false
     @State private var dragOffset: CGSize = .zero
+    @State private var currentTranslation: CGSize = .zero
     
     @State private var isPressed: Bool = false
     
     var body: some View {
         GeometryReader { geometry in
-            let safeArea = geometry.safeAreaInsets
             let screenWidth = geometry.size.width
             let screenHeight = geometry.size.height
+            let safeArea = geometry.safeAreaInsets
+           
+            let maxLeftOffset = -(screenWidth - buttonSize - 40)
+            let maxTopOffset = -(screenHeight - buttonSize - safeArea.top - safeArea.bottom - 40)
             
-            // MARK: - Floating Circle Body
             ZStack {
                 Circle()
                     .fill(AppColors.primary)
@@ -40,78 +41,56 @@ struct DraggableFAB: View {
                     .font(.system(size: 24, weight: .bold))
                     .foregroundStyle(.white)
             }
-            // Recover blur and scale animation when tap
             .opacity(isPressed ? 0.82 : 1.0)
             .scaleEffect(isPressed ? 0.92 : 1.0)
             .animation(.easeInOut(duration: 0.15), value: isPressed)
             .contentShape(Circle())
-            .position(
-                x: (isInitialized ? position.x : (screenWidth - buttonSize / 2 - 20)) + dragOffset.width,
-                y: (isInitialized ? position.y : (screenHeight - buttonSize / 2 - 24)) + dragOffset.height
+            .offset(
+                x: dragOffset.width + currentTranslation.width,
+                y: dragOffset.height + currentTranslation.height
             )
             .gesture(
                 DragGesture(minimumDistance: 0)
                     .onChanged { value in
-                        if !isInitialized {
-                            position = CGPoint(
-                                x: screenWidth - buttonSize / 2 - 20,
-                                y: screenHeight - buttonSize / 2 - 24
-                            )
-                            isInitialized = true
-                        }
-                        
-                        // Active tap animation
                         if !isPressed {
                             isPressed = true
                         }
-                        
-                        dragOffset = value.translation
+                        currentTranslation = value.translation
                     }
                     .onEnded { value in
-                        // Release tapp animation
                         isPressed = false
                         
                         let dragDistance = hypot(value.translation.width, value.translation.height)
                         
-                        // 1. Recognize Tap operation
+                        // 1. Click / Tap
                         if dragDistance < 2 {
-                            dragOffset = .zero
-                            
-                            // Produces a slight vibration upon successful press
+                            currentTranslation = .zero
                             let generator = UIImpactFeedbackGenerator(style: .medium)
                             generator.impactOccurred()
-                            
                             onTap()
                             return
                         }
                         
-                        // 2. Recognize Drag operation
-                        let newX = position.x + value.translation.width
-                        var newY = position.y + value.translation.height
+                        // 2. Drag
+                        var finalX = dragOffset.width + value.translation.width
+                        var finalY = dragOffset.height + value.translation.height
                         
-                        let minX = buttonSize / 2 + 16
-                        let maxX = screenWidth - buttonSize / 2 - 16
-                        let minY = buttonSize / 2 + safeArea.top + 20
-                        let maxY = screenHeight - buttonSize / 2 - 24
+                        // Limitation prevent out of screen
+                        finalX = min(max(finalX, maxLeftOffset), 0)
+                        finalY = min(max(finalY, maxTopOffset), 0)
                         
-                        newY = min(max(newY, minY), maxY)
-                        let snapX = newX < (screenWidth / 2) ? minX : maxX
+                        let midX = maxLeftOffset / 2
+                        let targetX: CGFloat = finalX < midX ? maxLeftOffset : 0
                         
                         withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
-                            position = CGPoint(x: snapX, y: newY)
-                            dragOffset = .zero
+                            dragOffset = CGSize(width: targetX, height: finalY)
+                            currentTranslation = .zero
                         }
                     }
             )
-            .onAppear {
-                if !isInitialized {
-                    position = CGPoint(
-                        x: screenWidth - buttonSize / 2 - 20,
-                        y: screenHeight - buttonSize / 2 - 24
-                    )
-                    isInitialized = true
-                }
-            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+            .padding(.trailing, 20)
+            .padding(.bottom, 20)
         }
     }
 }
@@ -120,7 +99,7 @@ struct DraggableFAB: View {
     ZStack {
         Color.gray.opacity(0.1).ignoresSafeArea()
         DraggableFAB {
-            print("Tapped FAB123")
+            print("Tapped FAB")
         }
     }
 }

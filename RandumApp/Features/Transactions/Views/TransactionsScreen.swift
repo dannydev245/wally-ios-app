@@ -160,20 +160,10 @@ struct TransactionsScreen: View {
                 }
                 
                 // MARK: - Floating Add Button
-                Button {
+                DraggableFAB {
                     viewModel.editingTransaction = nil
                     viewModel.showFormSheet = true
-                } label: {
-                    Image(systemName: "plus")
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 58, height: 58)
-                        .background(AppColors.primary)
-                        .clipShape(Circle())
-                        .shadow(color: AppColors.primary.opacity(0.4), radius: 8, y: 4)
                 }
-                .padding(.trailing, 20)
-                .padding(.bottom, 20)
             }
             .navigationTitle("Transactions")
             .navigationBarTitleDisplayMode(.inline)

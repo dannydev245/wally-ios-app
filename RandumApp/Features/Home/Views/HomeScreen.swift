@@ -241,19 +241,9 @@ struct HomeScreen: View {
                 }
                 
                 // MARK: - Floating Action Button (FAB)
-                Button {
+                DraggableFAB {
                     showCreateSheet = true
-                } label: {
-                    Image(systemName: "plus")
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 58, height: 58)
-                        .background(AppColors.primary)
-                        .clipShape(Circle())
-                        .shadow(color: AppColors.primary.opacity(0.4), radius: 8, x: 0, y: 4)
                 }
-                .padding(.trailing, 20)
-                .padding(.bottom, 20)
             }
             .navigationBarHidden(true)
             .onAppear {
