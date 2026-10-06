@@ -10,10 +10,10 @@ import SwiftUI
 struct MainTabScreens: View {
     var onLogout: () -> Void
     
+    @State private var selectedTab: MainAppTab = .home
     @State private var currentUser: User? = nil
     
     @StateObject private var transactionsViewModel = TransactionsViewModel()
-    @State private var selectedTab: MainAppTab = .home
     
     var body: some View {
         Group{
@@ -41,7 +41,9 @@ struct MainTabScreens: View {
                     }
                     .tag(MainAppTab.transactions)
                     
-                    AnalyzeScreen()
+                    AnalyzeScreen(
+                        transactionsViewModel: transactionsViewModel
+                    )
                         .id("analyze")
                         .tabItem {
                             Label("Analyze", systemImage: "chart.pie.fill")

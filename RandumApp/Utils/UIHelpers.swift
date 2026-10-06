@@ -37,3 +37,23 @@ struct AppPressableButtonStyle: ButtonStyle {
             .animation(.easeInOut(duration: 0.15), value: configuration.isPressed)
     }
 }
+
+// MARK: - formatVND
+func formatVND(_ amount: Double) -> String {
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .currency
+    formatter.locale = Locale(identifier: "vi_VN")
+    return formatter.string(from: NSNumber(value: amount)) ?? "\(Int(amount)) ₫"
+}
+
+// MARK: - formatCompactNumber
+func formatCompactNumber(_ number: Double) -> String {
+    if number >= 1_000_000_000 {
+        return String(format: "%.1fB", number / 1_000_000_000)
+    } else if number >= 1_000_000 {
+        return String(format: "%.1fM", number / 1_000_000)
+    } else if number >= 1_000 {
+        return String(format: "%.0fK", number / 1_000)
+    }
+    return "\(Int(number))"
+}

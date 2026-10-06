@@ -128,28 +128,31 @@ struct HomeScreen: View {
                         
                         // MARK: - Month Spending & Income Overview
                         VStack(alignment: .leading, spacing: 18) {
-                            Text("Monthly Overview")
-                                .font(.system(size: 18, weight: .bold))
-                                .foregroundStyle(AppColors.textPrimary)
-                                                        
                             // Legend note for chart
-                            HStack(spacing: 12) {
-                                HStack(spacing: 4) {
-                                    Circle()
-                                        .fill(AppColors.greenEmerald)
-                                        .frame(width: 8, height: 8)
-                                    Text("Income")
-                                        .font(.system(size: 11, weight: .medium))
-                                        .foregroundStyle(AppColors.textSecondary)
-                                }
+                            HStack {
+                                Text("Monthly Overview")
+                                    .font(.system(size: 18, weight: .bold))
+                                    .foregroundStyle(AppColors.textPrimary)
                                 
-                                HStack(spacing: 4) {
-                                    Circle()
-                                        .fill(AppColors.redBright)
-                                        .frame(width: 8, height: 8)
-                                    Text("Expense")
-                                        .font(.system(size: 11, weight: .medium))
-                                        .foregroundStyle(AppColors.textSecondary)
+                                Spacer()
+                                HStack(spacing: 12) {
+                                    HStack(spacing: 4) {
+                                        Circle()
+                                            .fill(AppColors.greenEmerald)
+                                            .frame(width: 8, height: 8)
+                                        Text("Income")
+                                            .font(.system(size: 11, weight: .medium))
+                                            .foregroundStyle(AppColors.textSecondary)
+                                    }
+                                    
+                                    HStack(spacing: 4) {
+                                        Circle()
+                                            .fill(AppColors.redBright)
+                                            .frame(width: 8, height: 8)
+                                        Text("Expense")
+                                            .font(.system(size: 11, weight: .medium))
+                                            .foregroundStyle(AppColors.textSecondary)
+                                    }                                    
                                 }
                             }
                                                         
@@ -194,7 +197,7 @@ struct HomeScreen: View {
                         }
                         .padding(16)
                         .background(AppColors.inputBackground)
-                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                        .clipShape(RoundedRectangle(cornerRadius: 24))
                         
                         // MARK: - Recent Transactions
                         VStack(spacing: 18) {
@@ -226,7 +229,7 @@ struct HomeScreen: View {
                                             .padding(.trailing, 12)
                                             .padding(.vertical, 6)
                                             .background(AppColors.inputBackground)
-                                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                                            .clipShape(RoundedRectangle(cornerRadius: 24))
                                     }
                                 }
                             }
@@ -273,24 +276,6 @@ struct HomeScreen: View {
                 .presentationDragIndicator(.visible)
             }
         }
-    }
-    
-    private func formatVND(_ amount: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = Locale(identifier: "vi_VN")
-        return formatter.string(from: NSNumber(value: amount)) ?? "\(Int(amount)) ₫"
-    }
-    
-    private func formatCompactNumber(_ number: Double) -> String {
-        if number >= 1_000_000_000 {
-            return String(format: "%.1fB", number / 1_000_000_000)
-        } else if number >= 1_000_000 {
-            return String(format: "%.1fM", number / 1_000_000)
-        } else if number >= 1_000 {
-            return String(format: "%.0fK", number / 1_000)
-        }
-        return "\(Int(number))"
     }
 }
 

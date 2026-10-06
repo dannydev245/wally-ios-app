@@ -73,7 +73,7 @@ class HomeViewModel: ObservableObject {
             
             var generatedData: [MonthlyChartData] = []
             for i in 0..<4 {
-                let label = "Week\(i + 1)"
+                let label = "W\(i + 1)"
                 generatedData.append(MonthlyChartData(weekLabel: label, amount: weeklyIncomes[i], type: .income))
                 generatedData.append(MonthlyChartData(weekLabel: label, amount: weeklyExpenses[i], type: .expense))
             }
