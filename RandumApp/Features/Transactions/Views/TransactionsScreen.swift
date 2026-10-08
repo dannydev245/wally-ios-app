@@ -122,7 +122,7 @@ struct TransactionsScreen: View {
                                             .padding(.vertical, 6)
                                             .listRowInsets(EdgeInsets())
                                             .listRowBackground(Color.clear)
-                                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                                 Button(role: .destructive) {
                                                     withAnimation(.easeInOut(duration: 0.25)) {
                                                         viewModel.deleteTransaction(tx)
