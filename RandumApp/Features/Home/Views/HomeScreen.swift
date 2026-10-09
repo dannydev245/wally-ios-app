@@ -10,6 +10,7 @@ import Charts
 
 struct HomeScreen: View {
     @EnvironmentObject private var userManager: UserManager
+    @ObservedObject private var themeManager = ThemeManager.shared
 
     @StateObject private var viewModel = HomeViewModel()
     @ObservedObject var transactionsViewModel: TransactionsViewModel
@@ -69,7 +70,7 @@ struct HomeScreen: View {
                                     .font(.system(size: 18, weight: .bold))
                                     .foregroundStyle(.white.opacity(0.85))
                                 
-                                Text(formatVND(viewModel.totalBalance))
+                                Text(viewModel.totalBalance.toCurrencyString())
                                     .font(.system(size: 28, weight: .bold))
                                     .foregroundStyle(.white)
                             }
@@ -86,7 +87,7 @@ struct HomeScreen: View {
                                             .font(.system(size: 13, weight: .medium))
                                             .foregroundStyle(Color.white.opacity(0.85))
                                         
-                                        Text(formatVND(viewModel.monthlyIncome))
+                                        Text(viewModel.monthlyIncome.toCurrencyString())
                                             .font(.system(size: 15, weight: .bold))
                                             .foregroundStyle(.white)
                                             .lineLimit(1)
@@ -107,7 +108,7 @@ struct HomeScreen: View {
                                             .font(.system(size: 13, weight: .medium))
                                             .foregroundStyle(Color.white.opacity(0.85))
                                         
-                                        Text(formatVND(viewModel.monthlyExpense))
+                                        Text(viewModel.monthlyExpense.toCurrencyString())
                                             .font(.system(size: 15, weight: .bold))
                                             .foregroundStyle(.white)
                                             .lineLimit(1)
@@ -184,7 +185,7 @@ struct HomeScreen: View {
                                         AxisGridLine()
                                         AxisValueLabel {
                                             if let amount = value.as(Double.self) {
-                                                Text(formatCompactNumber(amount))
+                                                Text(amount.toCompactCurrencyString())
                                                     .font(.system(size: 11))
                                             }
                                         }

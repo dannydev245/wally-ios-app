@@ -36,3 +36,13 @@ extension UserDefaults {
         }
     }
 }
+
+extension Double {
+    func toCurrencyString() -> String {
+        ThemeManager.shared.currentCurrency.format(amount: self)
+    }
+    
+    func toCompactCurrencyString() -> String {
+        ThemeManager.shared.currentCurrency.formatCompact(amount: self)
+    }
+}

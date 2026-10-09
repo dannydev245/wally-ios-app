@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TransactionFormSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @ObservedObject private var themeManager = ThemeManager.shared
     
     var transactionToEdit: TransactionItem? = nil
     var onSave: (String, Double, Date, TransactionType, TransactionCategory) -> Void
@@ -85,9 +86,9 @@ struct TransactionFormSheet: View {
                                     .foregroundStyle(AppColors.textPrimary)
                             }
                             
-                            // Amount (VND)
+                            // Amount
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("Amount (VND)")
+                                Text("Amount (\(themeManager.currentCurrency == .vnd ? "VND" : "USD")")
                                     .font(.system(size: 13, weight: .medium))
                                     .foregroundStyle(AppColors.textPrimary)
                                 
@@ -96,7 +97,7 @@ struct TransactionFormSheet: View {
                                         .keyboardType(.numberPad)
                                         .foregroundStyle(AppColors.textPrimary)
                                     
-                                    Text("₫")
+                                    Text(themeManager.currentCurrency.symbol)
                                         .font(.system(size: 16, weight: .bold))
                                         .foregroundStyle(AppColors.textSecondary)
                                 }
@@ -224,6 +225,7 @@ struct TransactionFormSheet: View {
                     .padding(.top, 10)
                     .padding(.horizontal, 20)
                 }
+                .scrollDismissesKeyboard(.interactively)
             }
             .navigationTitle(transactionToEdit == nil ? "New Transaction" : "Edit Transaction")
             .navigationBarTitleDisplayMode(.inline)

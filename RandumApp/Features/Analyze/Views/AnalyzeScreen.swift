@@ -89,7 +89,7 @@ struct AnalyzeScreen: View {
                                     .font(.system(size: 14, weight: .medium))
                                     .foregroundStyle(AppColors.textSecondary)
                                 
-                                Text(formatVND(viewModel.netFlow))
+                                Text(viewModel.netFlow.toCurrencyString())
                                     .font(.system(size: 28, weight: .bold))
                                     .foregroundStyle(viewModel.netFlow >= 0 ? AppColors.greenEmerald : AppColors.redBright)
                                     .lineLimit(1)
@@ -110,7 +110,7 @@ struct AnalyzeScreen: View {
                                         Text("Income")
                                             .font(.system(size: 13, weight: .medium))
                                             .foregroundStyle(AppColors.textSecondary)
-                                        Text(formatVND(viewModel.periodIncome))
+                                        Text(viewModel.periodIncome.toCurrencyString())
                                             .font(.system(size: 15, weight: .bold))
                                             .foregroundStyle(AppColors.greenEmerald)
                                             .lineLimit(1)
@@ -130,7 +130,7 @@ struct AnalyzeScreen: View {
                                         Text("Expense")
                                             .font(.system(size: 13, weight: .medium))
                                             .foregroundStyle(AppColors.textSecondary)
-                                        Text(formatVND(viewModel.periodExpense))
+                                        Text(viewModel.periodExpense.toCurrencyString())
                                             .font(.system(size: 15, weight: .bold))
                                             .foregroundStyle(AppColors.redBright)
                                             .lineLimit(1)
@@ -194,7 +194,7 @@ struct AnalyzeScreen: View {
                                         AxisGridLine()
                                         AxisValueLabel {
                                             if let amt = val.as(Double.self) {
-                                                Text(formatCompactNumber(amt))
+                                                Text(amt.toCompactCurrencyString())
                                                     .font(.system(size: 9))
                                             }
                                         }
@@ -237,14 +237,14 @@ struct AnalyzeScreen: View {
                                         .foregroundStyle(by: .value("Category", item.category.rawValue))
                                     }
                                     .frame(height: 190)
-                                    .chartLegend(.hidden) // Ẩn legend mặc định vì đã có danh sách bên dưới
+                                    .chartLegend(.hidden)
                                     
                                     VStack(spacing: 2) {
                                         Text("Total")
                                             .font(.system(size: 15, weight: .medium))
                                             .foregroundStyle(AppColors.textSecondary)
                                         
-                                        Text(formatCompactNumber(viewModel.periodExpense))
+                                        Text(viewModel.periodExpense.toCompactCurrencyString())
                                             .font(.system(size: 16, weight: .bold))
                                             .foregroundStyle(AppColors.textPrimary)
                                     }
@@ -263,7 +263,7 @@ struct AnalyzeScreen: View {
                                                     .font(.system(size: 16, weight: .medium))
                                                     .foregroundStyle(AppColors.textPrimary)
                                                 Spacer()
-                                                Text(formatVND(item.totalAmount))
+                                                Text(item.totalAmount.toCurrencyString())
                                                     .font(.system(size: 16, weight: .bold))
                                                     .foregroundStyle(AppColors.textPrimary)
                                                 Text(String(format: "(%.0f%%)", item.percentage * 100))

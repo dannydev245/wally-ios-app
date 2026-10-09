@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TransactionRowView: View {
     let transaction: TransactionItem
+    @ObservedObject private var themeManager = ThemeManager.shared
     
     var body: some View {
         HStack(spacing: 14) {
@@ -40,8 +41,8 @@ struct TransactionRowView: View {
                     .font(.system(size: 14))
                     .foregroundStyle(AppColors.textSecondary)
                 
-                // Amount formatted in VND
-                Text("\(transaction.type == .income ? "+" : "-")\(Int(transaction.amount).formatted()) ₫")
+                // Amount formatted
+                Text("\(transaction.type == .income ? "+" : "-")\(transaction.amount.toCurrencyString())")
                     .font(.system(size: 16, weight: .bold))
                     .foregroundStyle(transaction.type == .income ? Color.green : Color.red)
             }
