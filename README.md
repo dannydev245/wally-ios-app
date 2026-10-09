@@ -52,7 +52,7 @@
 
 1**. Clone the repository**:
    ```bash
-   git clone https://github.com/duydev245/random-ios-app.git
+   git clone https://github.com/duydev245/wally-ios-app.git
    cd RandumApp
 ```
 
