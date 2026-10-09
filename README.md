@@ -24,7 +24,6 @@
   - **Debounced Input Validation** (300ms) for responsive error feedback without main-thread stuttering.
   - Interactive keyboard dismissal (`.scrollDismissesKeyboard(.interactively)`) and seamless avoidance.
   - Safe **Danger Zone** with mandatory typing verification (`"LOGOUT"` / `"CLEAR"`) to prevent accidental data loss.
-- **📤 CSV Export**: Built-in export engine allowing users to share comprehensive transaction history via the native iOS share sheet.
 
 ---
 
