@@ -9,15 +9,18 @@ import Foundation
 import Combine
 
 class HomeViewModel: ObservableObject {
-    @Published var currentUser: User
+    var userManager = UserManager.shared
+    
     @Published var totalBalance: Double = 0
     @Published var monthlyIncome: Double = 0
     @Published var monthlyExpense: Double = 0
     @Published var recentTransactions: [TransactionItem] = []
     @Published var chartData: [MonthlyChartData] = []
     
-    init(user: User) {
-        self.currentUser = user
+    init() { }
+    
+    var user: User? {
+        userManager.currentUser
     }
     
     // Update data when transactions list change
@@ -56,28 +59,28 @@ class HomeViewModel: ObservableObject {
     }
     
     private func calculateWeeklyChart(from monthItems: [TransactionItem]) {
-            var weeklyIncomes: [Double] = [0, 0, 0, 0]
-            var weeklyExpenses: [Double] = [0, 0, 0, 0]
-            let calendar = Calendar.current
+        var weeklyIncomes: [Double] = [0, 0, 0, 0]
+        var weeklyExpenses: [Double] = [0, 0, 0, 0]
+        let calendar = Calendar.current
+        
+        for item in monthItems {
+            let day = calendar.component(.day, from: item.date)
+            let weekIndex = min((day - 1) / 7, 3)
             
-            for item in monthItems {
-                let day = calendar.component(.day, from: item.date)
-                let weekIndex = min((day - 1) / 7, 3)
-                
-                if item.type == .income {
-                    weeklyIncomes[weekIndex] += item.amount
-                } else {
-                    weeklyExpenses[weekIndex] += item.amount
-                }
+            if item.type == .income {
+                weeklyIncomes[weekIndex] += item.amount
+            } else {
+                weeklyExpenses[weekIndex] += item.amount
             }
-            
-            var generatedData: [MonthlyChartData] = []
-            for i in 0..<4 {
-                let label = "W\(i + 1)"
-                generatedData.append(MonthlyChartData(weekLabel: label, amount: weeklyIncomes[i], type: .income))
-                generatedData.append(MonthlyChartData(weekLabel: label, amount: weeklyExpenses[i], type: .expense))
-            }
-            
-            self.chartData = generatedData
         }
+        
+        var generatedData: [MonthlyChartData] = []
+        for i in 0..<4 {
+            let label = "W\(i + 1)"
+            generatedData.append(MonthlyChartData(weekLabel: label, amount: weeklyIncomes[i], type: .income))
+            generatedData.append(MonthlyChartData(weekLabel: label, amount: weeklyExpenses[i], type: .expense))
+        }
+        
+        self.chartData = generatedData
+    }
 }

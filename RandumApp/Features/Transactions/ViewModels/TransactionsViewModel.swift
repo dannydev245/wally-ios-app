@@ -126,4 +126,10 @@ class TransactionsViewModel: ObservableObject {
                 )
             }
     }
+    
+    // MARK: - Clear All Transactions (Xóa sạch danh sách giao dịch)
+    func clearAllTransactions() {
+        self.transactions.removeAll()
+        UserDefaults.standard.removeObject(forKey: AppStorageKeys.userTransaction)
+    }
 }

@@ -8,11 +8,17 @@
 import SwiftUI
 
 enum AppColors {
-    static let primary = Color("AppPrimary")
-    static let background = Color("AppBackground")
-    static let inputBackground = Color("AppInputBackground")
-    static let textPrimary = Color("TextPrimary")
-    static let textSecondary = Color("TextSecondary")
-    static let greenEmerald = Color("GreenEmerald")
-    static let redBright = Color("RedBright")
+    static var primary: Color {
+        ThemeManager.shared.currentAccent.primaryColor
+    }
+    static var background: Color {
+        ThemeManager.shared.currentAccent.backgroundColor
+    }
+    static var inputBackground: Color {
+        ThemeManager.shared.currentAccent.inputBackgroundColor
+    }
+    static let textPrimary = Color("TextPrimary", bundle: nil)
+    static let textSecondary = Color("TextSecondary", bundle: nil)
+    static let greenEmerald = Color("GreenEmerald", bundle: nil)
+    static let redBright = Color("RedBright", bundle: nil)
 }

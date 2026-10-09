@@ -57,3 +57,14 @@ func formatCompactNumber(_ number: Double) -> String {
     }
     return "\(Int(number))"
 }
+
+// MARK: - ActivityView Helper cho UIActivityViewController (Share CSV)
+struct ActivityView: UIViewControllerRepresentable {
+    let activityItems: [Any]
+    
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+    }
+    
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}

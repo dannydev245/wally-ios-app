@@ -9,17 +9,18 @@ import SwiftUI
 import Charts
 
 struct HomeScreen: View {
-    @StateObject private var viewModel: HomeViewModel
+    @EnvironmentObject private var userManager: UserManager
+
+    @StateObject private var viewModel = HomeViewModel()
     @ObservedObject var transactionsViewModel: TransactionsViewModel
+    
     
     var onSeeAllTapped: () -> Void
     
     init(
-        user: User,
         transactionsViewModel: TransactionsViewModel,
         onSeeAllTapped: @escaping () -> Void
     ) {
-        _viewModel = StateObject(wrappedValue: HomeViewModel(user: user))
         self.transactionsViewModel = transactionsViewModel
         self.onSeeAllTapped = onSeeAllTapped
     }
@@ -39,9 +40,12 @@ struct HomeScreen: View {
                                     .font(.system(size: 16, weight: .medium))
                                     .foregroundStyle(AppColors.textSecondary)
                                 
-                                Text(viewModel.currentUser.name)
+                                Text(userManager.currentUser?.name ?? "user")
                                     .font(.system(size: 24, weight: .bold))
                                     .foregroundStyle(AppColors.textPrimary)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.65)
+                                    .allowsTightening(true)
                             }
                             
                             Spacer()
@@ -49,9 +53,9 @@ struct HomeScreen: View {
                             ZStack {
                                 Circle()
                                     .fill(AppColors.primary.opacity(0.15))
-                                    .frame(width: 50, height: 48)
+                                    .frame(width: 50, height: 50)
                                 
-                                Image(systemName: viewModel.currentUser.avatarIconName)
+                                Image(systemName: "person.crop.circle.fill")
                                     .font(.system(size: 30, weight: .semibold))
                                     .foregroundStyle(AppColors.primary)
                             }
@@ -252,8 +256,8 @@ struct HomeScreen: View {
 
 #Preview {
     HomeScreen(
-        user: User(id: UUID(), name: "Duy Hoang Thanh", age: 22, gender: .male),
         transactionsViewModel: TransactionsViewModel(),
         onSeeAllTapped: {print("Abv")}
     )
+    .environmentObject(UserManager())
 }

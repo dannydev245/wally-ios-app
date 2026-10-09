@@ -146,7 +146,7 @@ struct GetUserInfoScreen: View {
                 }
                 
                 // MARK: - Age & Gender Row
-                VStack(alignment: .leading, spacing: 4){
+                VStack(alignment: .leading){
                     HStack(alignment: .top, spacing: 10) {
                         // Age Field
                         VStack(alignment: .leading, spacing: 4){

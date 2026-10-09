@@ -118,23 +118,49 @@ struct TransactionFormSheet: View {
                                             .font(.system(size: 13, weight: .medium))
                                             .foregroundStyle(AppColors.textPrimary)
                                         
-                                        HStack {
-                                            Picker("Category", selection: $selectedCategory) {
-                                                ForEach(TransactionCategory.categories(for: selectedType)) { category in
-                                                    Label(category.rawValue, systemImage: category.iconName)
-                                                        .tag(category)
+                                        Menu {
+                                            ForEach(TransactionCategory.categories(for: selectedType)) { category in
+                                                Button {
+                                                    selectedCategory = category
+                                                } label: {
+                                                    HStack {
+                                                        if selectedCategory == category {
+                                                            Label(
+                                                                category.rawValue,
+                                                                systemImage: "checkmark"
+                                                            )
+                                                        } else {
+                                                            Label(
+                                                                category.rawValue,
+                                                                systemImage: category.iconName
+                                                            )
+                                                        }
+                                                    }
                                                 }
                                             }
-                                            .pickerStyle(.menu)
-                                            .tint(AppColors.textPrimary)
-                                            .lineLimit(1)
-                                            .fixedSize(horizontal: true, vertical: false)
-                                            .animation(nil, value: selectedCategory)
+                                        } label: {
+                                            HStack(spacing: 8) {
+                                                Image(systemName: selectedCategory.iconName)
+                                                    .font(.system(size: 14))
+                                                    .foregroundStyle(AppColors.textPrimary)
+                                                
+                                                Text(selectedCategory.rawValue)
+                                                    .font(.system(size: 14, weight: .medium))
+                                                    .foregroundStyle(AppColors.textPrimary)
+                                                    .lineLimit(1)
+                                                
+                                                Spacer(minLength: 0)
+                                                
+                                                Image(systemName: "chevron.down")
+                                                    .font(.system(size: 12, weight: .semibold))
+                                                    .foregroundStyle(AppColors.textSecondary)
+                                            }
+                                            .padding(.horizontal, 12)
+                                            .frame(maxWidth: .infinity, minHeight: 48)
+                                            .background(AppColors.inputBackground)
+                                            .contentShape(Rectangle())
+                                            .clipShape(RoundedRectangle(cornerRadius: 12))
                                         }
-                                        .padding(.horizontal, 12)
-                                        .frame(maxWidth: .infinity, minHeight: 48)
-                                        .background(AppColors.inputBackground)
-                                        .clipShape(RoundedRectangle(cornerRadius: 12))
                                     }
                                     .frame(width: categoryWidth, alignment: .leading)
                                     

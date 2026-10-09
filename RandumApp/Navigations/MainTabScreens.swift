@@ -11,18 +11,17 @@ struct MainTabScreens: View {
     var onLogout: () -> Void
     
     @State private var selectedTab: MainAppTab = .home
-    @State private var currentUser: User? = nil
     @State private var showCreateSheet: Bool = false
     
     @StateObject private var transactionsViewModel = TransactionsViewModel()
+    @EnvironmentObject private var userManager: UserManager
     
     var body: some View {
         Group{
-            if let user = currentUser {
+            if userManager.currentUser != nil {
                 ZStack(alignment: .bottomTrailing){
                     TabView(selection: $selectedTab) {
                         HomeScreen(
-                            user: user,
                             transactionsViewModel: transactionsViewModel,
                             onSeeAllTapped: {
                                 selectedTab = .transactions
@@ -52,21 +51,31 @@ struct MainTabScreens: View {
                         }
                         .tag(MainAppTab.analyze)
                         
-                        ProfileScreen(onLogout: onLogout)
-                            .id("profile")
-                            .tabItem {
-                                Label("Profile", systemImage: "person.fill")
+                        ProfileScreen(
+                            transactionsViewModel: transactionsViewModel,
+                            onLogout: {
+                                transactionsViewModel.clearAllTransactions()
+                                onLogout()
                             }
-                            .tag(MainAppTab.profile)
+                        )
+                        .id("profile")
+                        .tabItem {
+                            Label("Profile", systemImage: "person.fill")
+                        }
+                        .tag(MainAppTab.profile)
                     }
                     .tint(AppColors.primary)
                     
-                    if selectedTab == .home || selectedTab == .transactions {
-                        DraggableFAB {
-                            showCreateSheet = true
-                        }
-                        .transition(.scale.combined(with: .opacity))
+                    let shouldShowFAB = selectedTab == .home || selectedTab == .transactions
+                    
+                    //                    if selectedTab == .home || selectedTab == .transactions {
+                    DraggableFAB {
+                        showCreateSheet = true
                     }
+                    .transition(.scale.combined(with: .opacity))
+                    .opacity(shouldShowFAB ? 1 : 0)
+                    .allowsHitTesting(shouldShowFAB)
+                    //                    }
                 }
                 .sheet(isPresented: $showCreateSheet) {
                     TransactionFormSheet(transactionToEdit: nil) { title, amount, date, type, category in
@@ -86,16 +95,10 @@ struct MainTabScreens: View {
                 ProgressView()
             }
         }
-        .onAppear {
-            if let savedUser = UserDefaults.standard.savedUser {
-                self.currentUser = savedUser
-            } else {
-                onLogout()
-            }
-        }
     }
 }
 
 #Preview {
     MainTabScreens(onLogout: {print("1")})
+        .environmentObject(UserManager())
 }

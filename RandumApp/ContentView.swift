@@ -1,40 +1,25 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var currentUser: User? = nil
+    @EnvironmentObject private var userManager: UserManager
     
     var body: some View {
         Group {
-            if currentUser == nil {
-                AuthStackScreens(onUserAuthenticated: login)
+            if userManager.currentUser == nil {
+                AuthStackScreens{ newUser in
+                    userManager.login(user: newUser)
+                }
             } else {
-                MainTabScreens(onLogout: logout)
+                MainTabScreens{
+                    userManager.logout()
+                }
             }
         }
         .tint(AppColors.primary)
-        .onAppear{
-            loadCurrentUser()
-        }
-    }
-    
-    private func loadCurrentUser(){
-        self.currentUser = UserDefaults.standard.savedUser
-    }
-    
-    private func login(_ newUser: User) {
-        withAnimation {
-            self.currentUser = newUser
-        }
-    }
-    
-    private func logout() {
-        UserDefaults.standard.savedUser = nil
-        withAnimation {
-            self.currentUser = nil
-        }
     }
 }
 
 #Preview {
     ContentView()
+        .environmentObject(UserManager())
 }
