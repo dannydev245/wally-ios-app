@@ -133,6 +133,7 @@ struct EditProfileSheet: View {
                     } label: {
                         Label("Cancel", systemImage: "multiply")
                     }
+                    .foregroundStyle(AppColors.primary)
                 }
             }
         }

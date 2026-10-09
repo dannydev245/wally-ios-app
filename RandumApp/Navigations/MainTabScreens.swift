@@ -10,6 +10,8 @@ import SwiftUI
 struct MainTabScreens: View {
     var onLogout: () -> Void
     
+    @ObservedObject private var themeManager = ThemeManager.shared
+    
     @State private var selectedTab: MainAppTab = .home
     @State private var showCreateSheet: Bool = false
     
@@ -64,7 +66,13 @@ struct MainTabScreens: View {
                         }
                         .tag(MainAppTab.profile)
                     }
-                    .tint(AppColors.primary)
+                    .tint(themeManager.currentAccent.primaryColor)
+                    .onChange(of: themeManager.selectedAccentRaw) { _, _ in
+                        UIView.animate(withDuration: 0.25) {
+                            UITabBar.appearance().tintColor = UIColor(themeManager.currentAccent.primaryColor)
+                        }
+                    }
+                    
                     
                     let shouldShowFAB = selectedTab == .home || selectedTab == .transactions
                     

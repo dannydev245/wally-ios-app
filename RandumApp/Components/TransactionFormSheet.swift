@@ -236,6 +236,7 @@ struct TransactionFormSheet: View {
                     } label: {
                         Label("Cancel", systemImage: "multiply")
                     }
+                    .foregroundStyle(AppColors.primary)
                 }
             }
         }
