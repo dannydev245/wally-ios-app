@@ -51,8 +51,8 @@
 
 1**. Clone the repository**:
    ```bash
-   git clone https://github.com/duydev245/wally-ios-app.git
-   cd RandumApp
+   git clone https://github.com/dannydev245/wally-ios-app.git
+   cd wally-ios-app
 ```
 
 2**. Requirements:**
