@@ -1,4 +1,4 @@
-# 💸 RandumApp - Smart Personal Finance Tracker
+# 💸 Wally - Smart Personal Finance Tracker
 
 <p align="center">
   <img src="https://img.shields.io/badge/Swift-5.9%2B-orange.svg?style=for-the-badge&logo=swift" alt="Swift" />
