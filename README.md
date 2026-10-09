@@ -50,17 +50,17 @@
 
 ## 🚀 Getting Started
 
-1. **Clone the repository**:
+1**. Clone the repository**:
    ```bash
    git clone https://github.com/duydev245/random-ios-app.git
    cd RandumApp
 ```
 
-2. **Requirements:**
+2**. Requirements:**
 - Xcode 15.0+
 - iOS 17.0+ (Simulator or Physical Device)
 
-3. **Build & Run:**
+3**. Build & Run:**
 - Open RandumApp.xcodeproj in Xcode.
 - Select your target device and press Cmd + R.
 
