@@ -9,6 +9,8 @@ import SwiftUI
 struct EditProfileSheet: View {
     @Environment(\.dismiss) private var dismiss
     
+    @ObservedObject private var themeManager = ThemeManager.shared
+    
     @State private var name: String
     @State private var age: String
     @State private var gender: Gender
@@ -55,7 +57,7 @@ struct EditProfileSheet: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                AppColors.background
+                themeManager.currentAccent.backgroundColor
                     .ignoresSafeArea()
                 
                 ScrollView(showsIndicators: false) {
@@ -133,10 +135,10 @@ struct EditProfileSheet: View {
                     } label: {
                         Label("Cancel", systemImage: "multiply")
                     }
-                    .foregroundStyle(AppColors.primary)
                 }
             }
         }
+        .tint(themeManager.currentAccent.primaryColor)
     }
     
     // MARK: - Subview: Gender Dropdown Menu
@@ -163,7 +165,7 @@ struct EditProfileSheet: View {
             .padding(.horizontal, 18)
             .frame(maxWidth: .infinity)
             .frame(height: 52)
-            .background(AppColors.inputBackground)
+            .background(themeManager.currentAccent.inputBackgroundColor)
             .contentShape(Capsule())
             .clipShape(Capsule())
         }

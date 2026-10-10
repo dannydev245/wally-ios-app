@@ -18,7 +18,7 @@ struct TransactionRowView: View {
                 .font(.system(size: 24, weight: .semibold))
                 .foregroundStyle(transaction.type == .income ? Color.green : AppColors.primary)
                 .frame(width: 54, height: 54)
-                .background(AppColors.inputBackground)
+                .background(themeManager.currentAccent.inputBackgroundColor)
                 .clipShape(Circle())
             
             // Title & Category

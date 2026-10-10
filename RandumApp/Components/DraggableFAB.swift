@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct DraggableFAB: View {
+    @ObservedObject private var themeManager = ThemeManager.shared
+    
     var onTap: () -> Void
     
     private let buttonSize: CGFloat = 58
@@ -28,10 +30,10 @@ struct DraggableFAB: View {
             
             ZStack {
                 Circle()
-                    .fill(AppColors.primary)
+                    .fill(themeManager.currentAccent.primaryColor)
                     .frame(width: buttonSize, height: buttonSize)
                     .shadow(
-                        color: AppColors.primary.opacity(isPressed ? 0.2 : 0.4),
+                        color: themeManager.currentAccent.primaryColor.opacity(isPressed ? 0.2 : 0.4),
                         radius: isPressed ? 4 : 8,
                         x: 0,
                         y: isPressed ? 2 : 4

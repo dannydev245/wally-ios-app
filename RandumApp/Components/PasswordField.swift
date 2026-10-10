@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct PasswordField: View {
+    @ObservedObject private var themeManager = ThemeManager.shared
+    
     let title: String
     @Binding var password: String
     var systemImage: String? = "lock"
@@ -70,8 +72,8 @@ struct PasswordField: View {
         .frame(height: 52)
         .background(
             isDisabled
-            ? AppColors.inputBackground.opacity(0.5)
-            : AppColors.inputBackground
+            ? themeManager.currentAccent.inputBackgroundColor.opacity(0.5)
+            : themeManager.currentAccent.inputBackgroundColor
         )
         .clipShape(Capsule())
     }

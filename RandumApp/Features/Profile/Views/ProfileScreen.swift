@@ -31,7 +31,7 @@ struct ProfileScreen: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                AppColors.background
+                themeManager.currentAccent.backgroundColor
                     .ignoresSafeArea()
                 
                 ScrollView(showsIndicators: false) {
@@ -108,6 +108,7 @@ struct ProfileScreen: View {
                 }
             }
         }
+        .tint(themeManager.currentAccent.primaryColor)
     }
     
     // Card 1: User Header
@@ -115,7 +116,7 @@ struct ProfileScreen: View {
         HStack(spacing: 10) {
             Image(systemName: "person.crop.circle.fill")
                 .font(.system(size: 50, weight: .semibold))
-                .foregroundStyle(AppColors.primary)
+                .foregroundStyle(themeManager.currentAccent.primaryColor)
             
             
             VStack(alignment: .leading, spacing: 4) {
@@ -138,17 +139,17 @@ struct ProfileScreen: View {
             } label: {
                 ZStack {
                     Circle()
-                        .fill(AppColors.primary.opacity(0.15))
+                        .fill(themeManager.currentAccent.primaryColor.opacity(0.15))
                         .frame(width: 40, height: 40)
                     
                     Image(systemName: "pencil")
                         .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(AppColors.primary)
+                        .foregroundStyle(themeManager.currentAccent.primaryColor)
                 }
             }
         }
         .padding(16)
-        .background(AppColors.inputBackground)
+        .background(themeManager.currentAccent.inputBackgroundColor)
         .clipShape(RoundedRectangle(cornerRadius: 24))
     }
     
@@ -210,7 +211,7 @@ struct ProfileScreen: View {
             }
         }
         .padding(16)
-        .background(AppColors.inputBackground)
+        .background(themeManager.currentAccent.inputBackgroundColor)
         .clipShape(RoundedRectangle(cornerRadius: 20))
     }
     
@@ -227,7 +228,7 @@ struct ProfileScreen: View {
             HStack {
                 HStack(spacing: 10) {
                     Image(systemName: "banknote.fill")
-                        .foregroundStyle(AppColors.primary)
+                        .foregroundStyle(themeManager.currentAccent.primaryColor)
                     Text("Currency Format")
                         .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(AppColors.textPrimary)
@@ -241,7 +242,7 @@ struct ProfileScreen: View {
                     }
                 }
                 .pickerStyle(.menu)
-                .tint(AppColors.primary)
+                .tint(themeManager.currentAccent.primaryColor)
             }
             
             Divider()
@@ -263,7 +264,7 @@ struct ProfileScreen: View {
             }
         }
         .padding(16)
-        .background(AppColors.inputBackground)
+        .background(themeManager.currentAccent.inputBackgroundColor)
         .clipShape(RoundedRectangle(cornerRadius: 20))
     }
     

@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct AuthTextField: View {
+    @ObservedObject private var themeManager = ThemeManager.shared
+    
     let title: String
     @Binding var text: String
     var systemImage: String? = nil
@@ -55,8 +57,8 @@ struct AuthTextField: View {
         .frame(height: 52)
         .background(
             isDisabled
-            ? AppColors.inputBackground.opacity(0.5)
-            : AppColors.inputBackground
+            ? themeManager.currentAccent.inputBackgroundColor.opacity(0.5)
+            : themeManager.currentAccent.inputBackgroundColor
         )
         .clipShape(Capsule())
     }

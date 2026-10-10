@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct WelcomeScreen: View {
+    @ObservedObject private var themeManager = ThemeManager.shared
+    
     let onGetStarted: () -> Void
     
     var body: some View {
@@ -17,7 +19,7 @@ struct WelcomeScreen: View {
             ZStack(alignment: .top) {
                 // Banner
                 ZStack {
-                    AppColors.primary
+                    themeManager.currentAccent.primaryColor
                         .ignoresSafeArea()
                     
                     VStack() {
@@ -79,7 +81,7 @@ struct WelcomeScreen: View {
                     Text("Wally")
                         .font(.system(size: 30, weight: .heavy))
                         .tracking(2)
-                        .foregroundStyle(AppColors.primary)
+                        .foregroundStyle(themeManager.currentAccent.primaryColor)
                     
                     Text("Take Control of Your Money")
                         .font(.system(size: 25, weight: .bold))

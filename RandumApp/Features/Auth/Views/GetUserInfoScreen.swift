@@ -9,6 +9,7 @@ import SwiftUI
 
 struct GetUserInfoScreen: View {
     var onComplete: (User) -> Void
+    @ObservedObject private var themeManager = ThemeManager.shared
     
     @State private var name: String = ""
     @State private var age: String = ""
@@ -65,7 +66,7 @@ struct GetUserInfoScreen: View {
     // MARK: - Subview: Banner Section
     private func topBannerSection(height: CGFloat, safeTop: CGFloat) -> some View {
         ZStack {
-            AppColors.primary
+            themeManager.currentAccent.primaryColor
                 .frame(maxWidth: .infinity)
                 .frame(height: height)
             
@@ -111,7 +112,7 @@ struct GetUserInfoScreen: View {
                 Text("Profile Setup")
                     .font(.system(size: 28, weight: .heavy))
                     .tracking(2)
-                    .foregroundStyle(AppColors.primary)
+                    .foregroundStyle(themeManager.currentAccent.primaryColor)
                 
                 Text("Tell Us About You")
                     .font(.system(size: 22, weight: .bold))
@@ -241,7 +242,7 @@ struct GetUserInfoScreen: View {
             .padding(.horizontal, 18)
             .frame(height: 52)
             .frame(maxWidth: .infinity)
-            .background(AppColors.inputBackground)
+            .background(themeManager.currentAccent.inputBackgroundColor)
             .clipShape(Capsule())
         }
     }

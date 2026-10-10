@@ -9,11 +9,12 @@ import SwiftUI
 
 struct TransactionsScreen: View {
     @ObservedObject var viewModel: TransactionsViewModel
+    @ObservedObject private var themeManager = ThemeManager.shared
     
     var body: some View {
         NavigationStack {
             ZStack(alignment: .bottomTrailing) {
-                AppColors.background
+                themeManager.currentAccent.backgroundColor
                     .ignoresSafeArea()
                 
                 VStack(spacing: 0) {
@@ -39,7 +40,7 @@ struct TransactionsScreen: View {
                                     }
                                 }
                                 .padding(12)
-                                .background(AppColors.inputBackground)
+                                .background(themeManager.currentAccent.inputBackgroundColor)
                                 .clipShape(Capsule())
                                 
                                 // Type Filter Chips (All, Expense, Income)
@@ -54,7 +55,11 @@ struct TransactionsScreen: View {
                                                 .font(.system(size: 14, weight: .semibold))
                                                 .padding(.horizontal, 16)
                                                 .padding(.vertical, 8)
-                                                .background(viewModel.selectedTypeFilter == type ? AppColors.primary : AppColors.inputBackground)
+                                                .background(
+                                                    viewModel.selectedTypeFilter == type
+                                                    ? themeManager.currentAccent.primaryColor
+                                                    : themeManager.currentAccent.inputBackgroundColor
+                                                )
                                                 .foregroundStyle(viewModel.selectedTypeFilter == type ? .white : AppColors.textSecondary)
                                                 .clipShape(Capsule())
                                         }
@@ -82,7 +87,7 @@ struct TransactionsScreen: View {
                                         }
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 8)
-                                        .background(AppColors.inputBackground)
+                                        .background(themeManager.currentAccent.inputBackgroundColor)
                                         .foregroundStyle(AppColors.textPrimary)
                                         .clipShape(Capsule())
                                     }
@@ -182,6 +187,7 @@ struct TransactionsScreen: View {
                 //                .presentationDetents([.height(520)])
             }
         }
+        .tint(themeManager.currentAccent.primaryColor)
     }
 }
 

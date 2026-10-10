@@ -29,7 +29,7 @@ struct HomeScreen: View {
     var body: some View {
         NavigationStack {
             ZStack(alignment: .bottomTrailing) {
-                AppColors.background
+                themeManager.currentAccent.backgroundColor
                     .ignoresSafeArea()
                 
                 ScrollView(showsIndicators: false) {
@@ -53,7 +53,7 @@ struct HomeScreen: View {
                             
                             ZStack {
                                 Circle()
-                                    .fill(AppColors.primary.opacity(0.15))
+                                    .fill(themeManager.currentAccent.primaryColor.opacity(0.15))
                                     .frame(width: 50, height: 50)
                                 
                                 Image(systemName: "person.crop.circle.fill")
@@ -122,13 +122,13 @@ struct HomeScreen: View {
                         .padding(16)
                         .background(
                             LinearGradient(
-                                colors: [AppColors.primary, AppColors.primary.opacity(0.85)],
+                                colors: [themeManager.currentAccent.primaryColor, themeManager.currentAccent.primaryColor.opacity(0.85)],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             )
                         )
                         .clipShape(RoundedRectangle(cornerRadius: 24))
-                        .shadow(color: AppColors.primary.opacity(0.25), radius: 12, y: 6)
+                        .shadow(color: themeManager.currentAccent.primaryColor.opacity(0.25), radius: 12, y: 6)
                         
                         // MARK: - Month Spending & Income Overview
                         VStack(alignment: .leading, spacing: 18) {
@@ -179,6 +179,7 @@ struct HomeScreen: View {
                                     )
                                     .cornerRadius(4)
                                 }
+                                .id(themeManager.currentCurrency)
                                 .frame(height: 150)
                                 .chartYAxis {
                                     AxisMarks(position: .leading) { value in
@@ -186,7 +187,7 @@ struct HomeScreen: View {
                                         AxisValueLabel {
                                             if let amount = value.as(Double.self) {
                                                 Text(amount.toCompactCurrencyString())
-                                                    .font(.system(size: 11))
+                                                    .font(.system(size: 9))
                                             }
                                         }
                                     }
@@ -194,13 +195,13 @@ struct HomeScreen: View {
                                 .chartXAxis {
                                     AxisMarks(position: .bottom) { _ in
                                         AxisValueLabel()
-                                            .font(.system(size: 11, weight: .medium))
+                                            .font(.system(size: 9, weight: .medium))
                                     }
                                 }
                             }
                         }
                         .padding(16)
-                        .background(AppColors.inputBackground)
+                        .background(themeManager.currentAccent.inputBackgroundColor)
                         .clipShape(RoundedRectangle(cornerRadius: 24))
                         
                         // MARK: - Recent Transactions
@@ -232,7 +233,7 @@ struct HomeScreen: View {
                                         TransactionRowView(transaction: tx)
                                             .padding(.trailing, 12)
                                             .padding(.vertical, 6)
-                                            .background(AppColors.inputBackground)
+                                            .background(themeManager.currentAccent.inputBackgroundColor)
                                             .clipShape(RoundedRectangle(cornerRadius: 24))
                                     }
                                 }
@@ -252,6 +253,7 @@ struct HomeScreen: View {
                 viewModel.updateData(from: newValue)
             }
         }
+        .tint(themeManager.currentAccent.primaryColor)
     }
 }
 

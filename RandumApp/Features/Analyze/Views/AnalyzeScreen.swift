@@ -9,13 +9,15 @@ import SwiftUI
 import Charts
 
 struct AnalyzeScreen: View {
+    @ObservedObject private var themeManager = ThemeManager.shared
+    
     @ObservedObject var transactionsViewModel: TransactionsViewModel
     @StateObject private var viewModel = AnalyzeViewModel()
     
     var body: some View {
         NavigationStack {
             ZStack {
-                AppColors.background
+                themeManager.currentAccent.backgroundColor
                     .ignoresSafeArea()
                 
                 ScrollView(showsIndicators: false) {
@@ -33,14 +35,14 @@ struct AnalyzeScreen: View {
                                         .font(.system(size: 14, weight: .semibold))
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, 10)
-                                        .background(viewModel.selectedScope == scope ? AppColors.primary : Color.clear)
+                                        .background(viewModel.selectedScope == scope ? themeManager.currentAccent.primaryColor : Color.clear)
                                         .foregroundStyle(viewModel.selectedScope == scope ? .white : AppColors.textSecondary)
                                         .clipShape(RoundedRectangle(cornerRadius: 10))
                                 }
                             }
                         }
                         .padding(4)
-                        .background(AppColors.inputBackground)
+                        .background(themeManager.currentAccent.inputBackgroundColor)
                         .clipShape(RoundedRectangle(cornerRadius: 24))
                         
                         // MARK: - Date Switcher (< Month/Year >)
@@ -55,7 +57,7 @@ struct AnalyzeScreen: View {
                                     .font(.system(size: 15, weight: .bold))
                                     .foregroundStyle(AppColors.textPrimary)
                                     .padding(10)
-                                    .background(AppColors.inputBackground)
+                                    .background(themeManager.currentAccent.inputBackgroundColor)
                                     .clipShape(Circle())
                             }
                             
@@ -77,7 +79,7 @@ struct AnalyzeScreen: View {
                                     .font(.system(size: 15, weight: .bold))
                                     .foregroundStyle(AppColors.textPrimary)
                                     .padding(10)
-                                    .background(AppColors.inputBackground)
+                                    .background(themeManager.currentAccent.inputBackgroundColor)
                                     .clipShape(Circle())
                             }
                         }
@@ -142,7 +144,7 @@ struct AnalyzeScreen: View {
                             }
                         }
                         .padding(16)
-                        .background(AppColors.inputBackground)
+                        .background(themeManager.currentAccent.inputBackgroundColor)
                         .clipShape(RoundedRectangle(cornerRadius: 24))
                         
                         // MARK: - Dynamic Scope Chart
@@ -188,6 +190,7 @@ struct AnalyzeScreen: View {
                                     .foregroundStyle(item.type == .income ? AppColors.greenEmerald : AppColors.redBright)
                                     .cornerRadius(3)
                                 }
+                                .id(themeManager.currentCurrency)
                                 .frame(height: 180)
                                 .chartYAxis {
                                     AxisMarks(position: .leading) { val in
@@ -209,7 +212,7 @@ struct AnalyzeScreen: View {
                             }
                         }
                         .padding(16)
-                        .background(AppColors.inputBackground)
+                        .background(themeManager.currentAccent.inputBackgroundColor)
                         .clipShape(RoundedRectangle(cornerRadius: 24))
                         
                         // MARK: - Category Spending Breakdown
@@ -279,7 +282,7 @@ struct AnalyzeScreen: View {
                                                         .frame(height: 6)
                                                     
                                                     Capsule()
-                                                        .fill(AppColors.primary)
+                                                        .fill(themeManager.currentAccent.primaryColor)
                                                         .frame(width: proxy.size.width * CGFloat(item.percentage), height: 6)
                                                 }
                                             }
@@ -290,7 +293,7 @@ struct AnalyzeScreen: View {
                             }
                         }
                         .padding(16)
-                        .background(AppColors.inputBackground)
+                        .background(themeManager.currentAccent.inputBackgroundColor)
                         .clipShape(RoundedRectangle(cornerRadius: 24))
                         
                         Spacer()
@@ -307,6 +310,7 @@ struct AnalyzeScreen: View {
                 viewModel.updateAnalytics(from: newValue)
             }
         }
+        .tint(themeManager.currentAccent.primaryColor)
     }
 }
 

@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct AppButton: View {
+    @ObservedObject private var themeManager = ThemeManager.shared
+    
     let title: String
     var isDisabled: Bool
     var isLoading: Bool
@@ -46,8 +48,8 @@ struct AppButton: View {
             .frame(height: 54)
             .background(
                 isButtonDisabled
-                ? AppColors.primary.opacity(0.4)
-                : AppColors.primary
+                ? themeManager.currentAccent.primaryColor.opacity(0.4)
+                : themeManager.currentAccent.primaryColor
             )
             .clipShape(Capsule())
         }

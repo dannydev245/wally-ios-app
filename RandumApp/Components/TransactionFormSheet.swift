@@ -45,7 +45,7 @@ struct TransactionFormSheet: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                AppColors.background
+                themeManager.currentAccent.backgroundColor
                     .ignoresSafeArea()
                 
                 ScrollView {
@@ -64,7 +64,10 @@ struct TransactionFormSheet: View {
                                         .font(.system(size: 15, weight: .bold))
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, 12)
-                                        .background(selectedType == type ? AppColors.primary : AppColors.inputBackground)
+                                        .background(
+                                            selectedType == type
+                                            ? themeManager.currentAccent.primaryColor
+                                            : themeManager.currentAccent.inputBackgroundColor)
                                         .foregroundStyle(selectedType == type ? .white : AppColors.textPrimary)
                                         .clipShape(RoundedRectangle(cornerRadius: 12))
                                 }
@@ -81,14 +84,14 @@ struct TransactionFormSheet: View {
                                 
                                 TextField("e.g. Lunch with friends", text: $title)
                                     .padding()
-                                    .background(AppColors.inputBackground)
+                                    .background(themeManager.currentAccent.inputBackgroundColor)
                                     .clipShape(RoundedRectangle(cornerRadius: 12))
                                     .foregroundStyle(AppColors.textPrimary)
                             }
                             
                             // Amount
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("Amount (\(themeManager.currentCurrency == .vnd ? "VND" : "USD")")
+                                Text("Amount (\(themeManager.currentCurrency == .vnd ? "VND" : "USD"))")
                                     .font(.system(size: 13, weight: .medium))
                                     .foregroundStyle(AppColors.textPrimary)
                                 
@@ -102,7 +105,7 @@ struct TransactionFormSheet: View {
                                         .foregroundStyle(AppColors.textSecondary)
                                 }
                                 .padding()
-                                .background(AppColors.inputBackground)
+                                .background(themeManager.currentAccent.inputBackgroundColor)
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
                             }
                             
@@ -158,7 +161,7 @@ struct TransactionFormSheet: View {
                                             }
                                             .padding(.horizontal, 12)
                                             .frame(maxWidth: .infinity, minHeight: 48)
-                                            .background(AppColors.inputBackground)
+                                            .background(themeManager.currentAccent.inputBackgroundColor)
                                             .contentShape(Rectangle())
                                             .clipShape(RoundedRectangle(cornerRadius: 12))
                                         }
@@ -195,7 +198,7 @@ struct TransactionFormSheet: View {
                                                 }
                                         }
                                         .frame(maxWidth: .infinity, minHeight: 48)
-                                        .background(AppColors.inputBackground)
+                                        .background(themeManager.currentAccent.inputBackgroundColor)
                                         .clipShape(RoundedRectangle(cornerRadius: 12))
                                     }
                                     .frame(width: dateWidth, alignment: .leading)
@@ -216,7 +219,7 @@ struct TransactionFormSheet: View {
                                 .font(.system(size: 16, weight: .bold))
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 16)
-                                .background(isFormValid ? AppColors.primary : Color.gray.opacity(0.3))
+                                .background(isFormValid ? themeManager.currentAccent.primaryColor : Color.gray.opacity(0.3))
                                 .foregroundStyle(.white)
                                 .clipShape(RoundedRectangle(cornerRadius: 16))
                         }
@@ -236,10 +239,10 @@ struct TransactionFormSheet: View {
                     } label: {
                         Label("Cancel", systemImage: "multiply")
                     }
-                    .foregroundStyle(AppColors.primary)
                 }
             }
         }
+        .tint(themeManager.currentAccent.primaryColor)
     }
 }
 
