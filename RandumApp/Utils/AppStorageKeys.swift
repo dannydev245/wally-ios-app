@@ -13,4 +13,5 @@ enum AppStorageKeys {
     static let appTheme = "appTheme"
     static let appCurrency = "appCurrency"
     static let appAccentColor = "appAccentColor"
+    static let appLanguage = "appLanguage"
 }

@@ -8,6 +8,7 @@ import SwiftUI
         WindowGroup {
             ContentView()
                 .environmentObject(userManager)
+                .environment(\.locale, themeManager.currentLanguage.locale)
                 .preferredColorScheme(themeManager.currentTheme.colorScheme)
         }
     }

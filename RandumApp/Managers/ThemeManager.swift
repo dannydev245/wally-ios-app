@@ -8,6 +8,30 @@
 import SwiftUI
 import Combine
 
+enum AppLanguage: String, CaseIterable, Identifiable {
+    case system = "System"
+    case en = "English"
+    case vi = "Tiếng Việt"
+    
+    var id: String { rawValue }
+    
+    var code: String {
+        switch self {
+        case .system:
+            let systemCode = Locale.current.language.languageCode?.identifier ?? "en"
+            return systemCode.hasPrefix("vi") ? "vi" : "en"
+        case .en:
+            return "en"
+        case .vi:
+            return "vi"
+        }
+    }
+    
+    var locale: Locale {
+        Locale(identifier: code)
+    }
+}
+
 enum AppThemeMode: String, CaseIterable, Identifiable {
     case system = "System"
     case light = "Light"
@@ -135,6 +159,9 @@ class ThemeManager: ObservableObject {
     @AppStorage(AppStorageKeys.appAccentColor) var selectedAccentRaw: String = AppAccentColor.indigo.rawValue
     @AppStorage(AppStorageKeys.appTheme) var selectedThemeRaw: String = AppThemeMode.system.rawValue
     @AppStorage(AppStorageKeys.appCurrency) var selectedCurrencyRaw: String = CurrencyType.vnd.rawValue
+    @AppStorage(AppStorageKeys.appLanguage) var selectedLanguageRaw: String = AppLanguage.system.rawValue {
+        didSet { objectWillChange.send() }
+    }
     
     var currentAccent: AppAccentColor {
         get { AppAccentColor(rawValue: selectedAccentRaw) ?? .indigo }
@@ -158,6 +185,10 @@ class ThemeManager: ObservableObject {
             selectedCurrencyRaw = newValue.rawValue
             objectWillChange.send()
         }
+    }
+    
+    var currentLanguage: AppLanguage {
+        AppLanguage(rawValue: selectedLanguageRaw) ?? .system
     }
 }
 

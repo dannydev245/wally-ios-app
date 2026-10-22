@@ -193,6 +193,24 @@ struct ProfileScreen: View {
             
             Divider()
             
+            HStack {
+                Text("Language")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(AppColors.textPrimary)
+                
+                Spacer()
+                
+                Picker("Language", selection: $themeManager.selectedLanguageRaw) {
+                    ForEach(AppLanguage.allCases) { lang in
+                        Text(LocalizedStringKey(lang.rawValue)).tag(lang.rawValue)
+                    }
+                }
+                .pickerStyle(.menu)
+                .tint(themeManager.currentAccent.primaryColor)
+            }
+            
+            Divider()
+            
             // System / Light / Dark
             HStack {
                 Text("Display Mode")
