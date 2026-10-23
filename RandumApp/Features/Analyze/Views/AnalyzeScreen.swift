@@ -31,7 +31,7 @@ struct AnalyzeScreen: View {
                                         viewModel.updateAnalytics(from: transactionsViewModel.transactions)
                                     }
                                 } label: {
-                                    Text(scope.rawValue)
+                                    Text(scope.localizedTitle)
                                         .font(.system(size: 14, weight: .semibold))
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, 10)

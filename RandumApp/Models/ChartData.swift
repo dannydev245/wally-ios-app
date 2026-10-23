@@ -21,6 +21,15 @@ enum TimeScope: String, CaseIterable, Identifiable {
     case year = "Year"
     
     var id: String { self.rawValue }
+    
+    var localizedTitle: LocalizedStringResource {
+        switch self {
+        case .day: return "Day"
+        case .week: return "Week"
+        case .month: return "Month"
+        case .year: return "Year"
+        }
+    }
 }
 
 struct ScopeChartData: Identifiable {
