@@ -220,7 +220,7 @@ struct GetUserInfoScreen: View {
                     selectedGender = gender
                 } label: {
                     HStack {
-                        Text(gender.displayName)
+                        Text(gender.localizedName)
                         if selectedGender == gender {
                             Image(systemName: "checkmark")
                         }
@@ -229,7 +229,7 @@ struct GetUserInfoScreen: View {
             }
         } label: {
             HStack {
-                Text(selectedGender.displayName)
+                Text(selectedGender.localizedName)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(AppColors.textPrimary)
                 

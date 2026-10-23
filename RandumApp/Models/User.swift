@@ -13,8 +13,12 @@ enum Gender: String, CaseIterable, Identifiable, Codable {
     
     var id: String { self.rawValue }
     
-    var displayName: String {
-        return self.rawValue
+    var localizedName: LocalizedStringResource {
+        switch self {
+        case .male: return "Male"
+        case .female: return "Female"
+        case .other: return "Others"
+        }
     }
 }
 

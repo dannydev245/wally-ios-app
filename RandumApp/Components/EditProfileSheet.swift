@@ -146,12 +146,12 @@ struct EditProfileSheet: View {
         Menu {
             Picker("Gender", selection: $gender) {
                 ForEach(Gender.allCases) { g in
-                    Text(g.displayName).tag(g)
+                    Text(g.localizedName).tag(g)
                 }
             }
         } label: {
             HStack {
-                Text(gender.displayName)
+                Text(gender.localizedName)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(AppColors.textPrimary)
                     .lineLimit(1)

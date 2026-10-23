@@ -127,7 +127,7 @@ struct ProfileScreen: View {
                     .minimumScaleFactor(0.65)
                     .allowsTightening(true)
                 
-                Text("\(currentUser.age) yrs old • \(currentUser.gender.displayName)")
+                Text("\(currentUser.age) yrs old • \(currentUser.gender.localizedName)")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundStyle(AppColors.textSecondary)
             }
@@ -202,7 +202,7 @@ struct ProfileScreen: View {
                 
                 Picker("Language", selection: $themeManager.selectedLanguageRaw) {
                     ForEach(AppLanguage.allCases) { lang in
-                        Text(LocalizedStringKey(lang.rawValue)).tag(lang.rawValue)
+                        Text(lang.title).tag(lang.rawValue)
                     }
                 }
                 .pickerStyle(.menu)
