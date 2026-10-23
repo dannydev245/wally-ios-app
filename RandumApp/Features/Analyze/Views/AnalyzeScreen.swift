@@ -262,7 +262,7 @@ struct AnalyzeScreen: View {
                                     ForEach(viewModel.categoryBreakdown) { item in
                                         VStack(spacing: 6) {
                                             HStack {
-                                                Label(item.category.rawValue, systemImage: item.category.iconName)
+                                                Label(item.category.localizedTitle, systemImage: item.category.iconName)
                                                     .font(.system(size: 16, weight: .medium))
                                                     .foregroundStyle(AppColors.textPrimary)
                                                 Spacer()

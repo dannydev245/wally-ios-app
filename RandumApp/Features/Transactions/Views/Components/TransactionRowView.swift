@@ -28,7 +28,7 @@ struct TransactionRowView: View {
                     .foregroundStyle(AppColors.textPrimary)
                     .lineLimit(1)
                 
-                Text(transaction.category.rawValue)
+                Text(transaction.category.localizedTitle)
                     .font(.system(size: 14))
                     .foregroundStyle(AppColors.textSecondary)
             }

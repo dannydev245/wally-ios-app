@@ -51,7 +51,7 @@ struct TransactionsScreen: View {
                                                 viewModel.selectedTypeFilter = type
                                             }
                                         } label: {
-                                            Text(type.rawValue)
+                                            Text(type.localizedTitle)
                                                 .font(.system(size: 14, weight: .semibold))
                                                 .padding(.horizontal, 16)
                                                 .padding(.vertical, 8)
@@ -69,27 +69,48 @@ struct TransactionsScreen: View {
                                     Spacer()
                                     
                                     // Date Range Picker Menu
+                                    let isFilterActive = viewModel.selectedDateRange != .all
+                                    
                                     Menu {
                                         ForEach(DateRangeFilter.allCases, id: \.self) { range in
-                                            Button(range.rawValue) {
-                                                viewModel.selectedDateRange = range
+                                            Button {
+                                                withAnimation(.easeInOut(duration: 0.2)) {
+                                                    viewModel.selectedDateRange = range
+                                                }
+                                            } label: {
+                                                HStack {
+                                                    Text(range.localizedTitle)
+                                                    if viewModel.selectedDateRange == range {
+                                                        Image(systemName: "checkmark")
+                                                    }
+                                                }
                                             }
                                         }
                                     } label: {
-                                        HStack(spacing: 4) {
-                                            Text(viewModel.selectedDateRange.rawValue)
-                                                .font(.system(size: 14, weight: .medium))
-                                                .frame(minWidth: 84)
-                                                .lineLimit(1)
+                                        ZStack(alignment: .topTrailing) {
+                                            Image(systemName: isFilterActive ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
+                                                .font(.system(size: 18, weight: .medium))
+                                                .foregroundStyle(isFilterActive ? .white : AppColors.textPrimary)
+                                                .frame(width: 36, height: 36)
+                                                .background(
+                                                    isFilterActive
+                                                    ? themeManager.currentAccent.primaryColor
+                                                    : themeManager.currentAccent.inputBackgroundColor
+                                                )
+                                                .clipShape(Circle())
                                             
-                                            Image(systemName: "chevron.down")
-                                                .font(.system(size: 10))
+                                            if isFilterActive {
+                                                Circle()
+                                                    .fill(Color.white)
+                                                    .frame(width: 14, height: 14)
+                                                    .overlay(
+                                                        Text("1")
+                                                            .font(.system(size: 9, weight: .heavy))
+                                                            .foregroundStyle(themeManager.currentAccent.primaryColor)
+                                                    )
+                                                    .offset(x: 2, y: -2)
+                                            }
                                         }
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 8)
-                                        .background(themeManager.currentAccent.inputBackgroundColor)
-                                        .foregroundStyle(AppColors.textPrimary)
-                                        .clipShape(Capsule())
                                     }
                                     .buttonStyle(.plain)
                                 }

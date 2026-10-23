@@ -12,6 +12,13 @@ enum TransactionType: String, CaseIterable, Codable, Identifiable {
     case income = "Income"
     
     var id: String{ rawValue }
+    
+    var localizedTitle: LocalizedStringResource {
+        switch self {
+        case .expense: return "Expense"
+        case .income: return "Income"
+        }
+    }
 }
 
 enum TransactionCategory: String, CaseIterable, Codable, Identifiable {
@@ -29,6 +36,20 @@ enum TransactionCategory: String, CaseIterable, Codable, Identifiable {
     case other = "Other"
     
     var id: String { rawValue }
+    
+    var localizedTitle: LocalizedStringResource {
+        switch self {
+        case .shopping: return "Shopping"
+        case .food: return "Food & Beverage"
+        case .transport: return "Transportation"
+        case .bills: return "Bills & Utilities"
+        case .entertainment: return "Entertainment"
+        case .salary: return "Salary"
+        case .bonus: return "Bonus"
+        case .investment: return "Investment"
+        case .other: return "Other"
+        }
+    }
     
     var iconName: String {
         switch self {

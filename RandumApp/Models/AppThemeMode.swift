@@ -13,6 +13,14 @@ enum AppThemeMode: String, CaseIterable, Identifiable {
     
     var id: String { rawValue }
     
+    var localizedTitle: LocalizedStringResource {
+        switch self {
+        case .system: return "System"
+        case .light: return "Light"
+        case .dark: return "Dark"
+        }
+    }
+    
     var colorScheme: ColorScheme? {
         switch self {
         case .system: return nil

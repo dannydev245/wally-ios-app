@@ -60,7 +60,7 @@ struct TransactionFormSheet: View {
                                         selectedCategory = TransactionCategory.categories(for: type).first ?? .other
                                     }
                                 } label: {
-                                    Text(type.rawValue)
+                                    Text(type.localizedTitle)
                                         .font(.system(size: 15, weight: .bold))
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, 12)
@@ -130,12 +130,12 @@ struct TransactionFormSheet: View {
                                                     HStack {
                                                         if selectedCategory == category {
                                                             Label(
-                                                                category.rawValue,
+                                                                category.localizedTitle,
                                                                 systemImage: "checkmark"
                                                             )
                                                         } else {
                                                             Label(
-                                                                category.rawValue,
+                                                                category.localizedTitle,
                                                                 systemImage: category.iconName
                                                             )
                                                         }
@@ -148,7 +148,7 @@ struct TransactionFormSheet: View {
                                                     .font(.system(size: 14))
                                                     .foregroundStyle(AppColors.textPrimary)
                                                 
-                                                Text(selectedCategory.rawValue)
+                                                Text(selectedCategory.localizedTitle)
                                                     .font(.system(size: 14, weight: .medium))
                                                     .foregroundStyle(AppColors.textPrimary)
                                                     .lineLimit(1)

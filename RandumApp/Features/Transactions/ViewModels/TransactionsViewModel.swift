@@ -12,12 +12,32 @@ enum TransactionFilterType: String, CaseIterable {
     case all = "All"
     case expense = "Expense"
     case income = "Income"
+    
+    var id: String { rawValue }
+    
+    var localizedTitle: LocalizedStringResource {
+        switch self {
+        case .all: return "All"
+        case .expense: return "Expense"
+        case .income: return "Income"
+        }
+    }
 }
 
 enum DateRangeFilter: String, CaseIterable {
     case all = "All Time"
     case thisMonth = "This Month"
     case last7Days = "Last 7 Days"
+    
+    var id: String { rawValue }
+    
+    var localizedTitle: LocalizedStringResource {
+        switch self {
+        case .all: return "All Time"
+        case .thisMonth: return "This Month"
+        case .last7Days: return "Last 7 Days"
+        }
+    }
 }
 
 class TransactionsViewModel: ObservableObject {

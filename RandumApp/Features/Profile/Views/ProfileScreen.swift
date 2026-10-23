@@ -221,11 +221,11 @@ struct ProfileScreen: View {
                 
                 Picker("", selection: $themeManager.currentTheme) {
                     ForEach(AppThemeMode.allCases) { mode in
-                        Text(mode.rawValue).tag(mode)
+                        Text(mode.localizedTitle).tag(mode)
                     }
                 }
                 .pickerStyle(.segmented)
-                .frame(width: 200)
+                .frame(width: 220)
             }
         }
         .padding(16)
