@@ -168,7 +168,7 @@ struct TransactionsScreen: View {
                                             }
                                     }
                                 } header: {
-                                    Text(group.dateTitle)
+                                    Text(formatMonthHeader(group.date))
                                         .font(.system(size: 14, weight: .bold))
                                         .textCase(nil)
                                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -209,6 +209,12 @@ struct TransactionsScreen: View {
             }
         }
         .tint(themeManager.currentAccent.primaryColor)
+    }
+    
+    private func formatMonthHeader(_ date: Date) -> String {
+        let style = Date.FormatStyle.dateTime.month(.abbreviated).year()
+        let rawString = date.formatted(style.locale(themeManager.currentLanguage.locale))
+        return rawString.prefix(1).uppercased() + rawString.dropFirst()
     }
 }
 

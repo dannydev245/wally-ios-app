@@ -129,9 +129,6 @@ class TransactionsViewModel: ObservableObject {
         let sorted = filteredTransactions
         let calendar = Calendar.current
         
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMMM yyyy"
-        
         let groupedDictionary = Dictionary(grouping: sorted) { item in
             let components = calendar.dateComponents([.year, .month], from: item.date)
             return calendar.date(from: components) ?? item.date
@@ -141,7 +138,7 @@ class TransactionsViewModel: ObservableObject {
             .sorted(by: >)
             .map { monthDate in
                 TransactionGroup(
-                    dateTitle: formatter.string(from: monthDate),
+                    date: monthDate,
                     items: groupedDictionary[monthDate] ?? []
                 )
             }

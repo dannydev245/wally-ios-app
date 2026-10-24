@@ -87,6 +87,6 @@ struct TransactionItem: Identifiable, Codable, Equatable {
 
 struct TransactionGroup: Identifiable {
     let id = UUID()
-    let dateTitle: String 
+    let date: Date
     let items: [TransactionItem]
 }

@@ -37,9 +37,14 @@ struct TransactionRowView: View {
             
             VStack(alignment: .trailing, spacing: 4) {
                 // Date
-                Text(transaction.date.formatted(date: .abbreviated, time: .omitted))
-                    .font(.system(size: 14))
-                    .foregroundStyle(AppColors.textSecondary)
+                Text(
+                    transaction.date.formatted(
+                        Date.FormatStyle(date: .abbreviated, time: .omitted)
+                            .locale(themeManager.currentLanguage.locale)
+                    )
+                )
+                .font(.system(size: 14))
+                .foregroundStyle(AppColors.textSecondary)
                 
                 // Amount formatted
                 Text("\(transaction.type == .income ? "+" : "-")\(transaction.amount.toCurrencyString())")
