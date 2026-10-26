@@ -109,102 +109,97 @@ struct TransactionFormSheet: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
                             }
                             
-                            GeometryReader { proxy in
-                                let spacing: CGFloat = 12
-                                let availableWidth = proxy.size.width - spacing
-                                let categoryWidth = availableWidth * (2.0 / 3.0)
-                                let dateWidth = availableWidth * (1.0 / 3.0)
-                                
-                                HStack(spacing: spacing) {
-                                    // MARK: - Category Selection (2/3 Width)
-                                    VStack(alignment: .leading, spacing: 8) {
-                                        Text("Category")
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundStyle(AppColors.textPrimary)
-                                        
-                                        Menu {
-                                            ForEach(TransactionCategory.categories(for: selectedType)) { category in
-                                                Button {
-                                                    selectedCategory = category
-                                                } label: {
-                                                    HStack {
-                                                        if selectedCategory == category {
-                                                            Label(
-                                                                category.localizedTitle,
-                                                                systemImage: "checkmark"
-                                                            )
-                                                        } else {
-                                                            Label(
-                                                                category.localizedTitle,
-                                                                systemImage: category.iconName
-                                                            )
-                                                        }
+                            HStack(alignment: .top, spacing: 12) {
+                                // MARK: - Category Selection (~58% Width)
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("Category")
+                                        .font(.system(size: 13, weight: .medium))
+                                        .foregroundStyle(AppColors.textPrimary)
+                                    
+                                    Menu {
+                                        ForEach(TransactionCategory.categories(for: selectedType)) { category in
+                                            Button {
+                                                selectedCategory = category
+                                            } label: {
+                                                HStack {
+                                                    if selectedCategory == category {
+                                                        Label(category.localizedTitle, systemImage: "checkmark")
+                                                    } else {
+                                                        Label(category.localizedTitle, systemImage: category.iconName)
                                                     }
                                                 }
                                             }
-                                        } label: {
-                                            HStack(spacing: 8) {
-                                                Image(systemName: selectedCategory.iconName)
-                                                    .font(.system(size: 14))
-                                                    .foregroundStyle(AppColors.textPrimary)
-                                                
-                                                Text(selectedCategory.localizedTitle)
-                                                    .font(.system(size: 14, weight: .medium))
-                                                    .foregroundStyle(AppColors.textPrimary)
-                                                    .lineLimit(1)
-                                                
-                                                Spacer(minLength: 0)
-                                                
-                                                Image(systemName: "chevron.down")
-                                                    .font(.system(size: 12, weight: .semibold))
-                                                    .foregroundStyle(AppColors.textSecondary)
-                                            }
-                                            .padding(.horizontal, 12)
-                                            .frame(maxWidth: .infinity, minHeight: 48)
-                                            .background(themeManager.currentAccent.inputBackgroundColor)
-                                            .contentShape(Rectangle())
-                                            .clipShape(RoundedRectangle(cornerRadius: 12))
                                         }
-                                    }
-                                    .frame(width: categoryWidth, alignment: .leading)
-                                    
-                                    // MARK: - Date Picker (1/3 width)
-                                    VStack(alignment: .leading, spacing: 8) {
-                                        Text("Date")
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundStyle(AppColors.textPrimary)
-                                        
-                                        ZStack {
-                                            HStack(spacing: 6) {
-                                                Image(systemName: "calendar")
-                                                    .font(.system(size: 14))
-                                                    .foregroundStyle(AppColors.textSecondary)
-                                                
-                                                Text(selectedDate.formatted(date: .abbreviated, time: .omitted))
-                                                    .font(.system(size: 14, weight: .medium))
-                                                    .foregroundStyle(AppColors.textPrimary)
-                                                    .lineLimit(1)
-                                            }
-                                            DatePicker("", selection: $selectedDate, in: ...Date(), displayedComponents: [.date])
-                                                .id(pickerId)
-                                                .datePickerStyle(.compact)
-                                                .labelsHidden()
-                                                .colorMultiply(.clear)
-                                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                                .opacity(0.015)
-                                                .contentShape(Rectangle())
-                                                .onChange(of: selectedDate) {
-                                                    pickerId = UUID()
-                                                }
+                                    } label: {
+                                        HStack(spacing: 8) {
+                                            Image(systemName: selectedCategory.iconName)
+                                                .font(.system(size: 14))
+                                                .foregroundStyle(AppColors.textPrimary)
+                                            
+                                            Text(selectedCategory.localizedTitle)
+                                                .font(.system(size: 14, weight: .medium))
+                                                .foregroundStyle(AppColors.textPrimary)
+                                                .lineLimit(1)
+                                            
+                                            Spacer(minLength: 0)
+                                            
+                                            Image(systemName: "chevron.down")
+                                                .font(.system(size: 11, weight: .semibold))
+                                                .foregroundStyle(AppColors.textSecondary)
                                         }
-                                        .frame(maxWidth: .infinity, minHeight: 48)
+                                        .padding(.horizontal, 12)
+                                        .frame(maxWidth: .infinity)
+                                        .frame(height: 52)
                                         .background(themeManager.currentAccent.inputBackgroundColor)
+                                        .contentShape(Rectangle())
                                         .clipShape(RoundedRectangle(cornerRadius: 12))
                                     }
-                                    .frame(width: dateWidth, alignment: .leading)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .layoutPriority(1)
+                                
+                                // MARK: - Date Picker (~42% Width)
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("Date")
+                                        .font(.system(size: 13, weight: .medium))
+                                        .foregroundStyle(AppColors.textPrimary)
+                                    
+                                    ZStack {
+                                        HStack(spacing: 6) {
+                                            Image(systemName: "calendar")
+                                                .font(.system(size: 14))
+                                                .foregroundStyle(AppColors.textSecondary)
+                                            
+                                            Text(
+                                                selectedDate.formatted(
+                                                    Date.FormatStyle(date: .abbreviated, time: .omitted)
+                                                        .locale(themeManager.currentLanguage.locale)
+                                                )
+                                            )
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundStyle(AppColors.textPrimary)
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.8)
+                                        }
+                                        .padding(.horizontal, 10)
+                                        
+                                        DatePicker("", selection: $selectedDate, in: ...Date(), displayedComponents: [.date])
+                                            .id(pickerId)
+                                            .datePickerStyle(.compact)
+                                            .labelsHidden()
+                                            .colorMultiply(.clear)
+                                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                            .opacity(0.015)
+                                            .contentShape(Rectangle())
+                                            .onChange(of: selectedDate) {
+                                                pickerId = UUID()
+                                            }
+                                    }
+                                    .frame(width: 140, height: 52)
+                                    .background(themeManager.currentAccent.inputBackgroundColor)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
                                 }
                             }
-                            .frame(height: 46)
                         }
                         
                         Spacer()
