@@ -56,12 +56,6 @@ struct DraggableFAB: View {
                     Circle()
                         .fill(themeManager.currentAccent.primaryColor)
                         .frame(width: buttonSize, height: buttonSize)
-                        .shadow(
-                            color: themeManager.currentAccent.primaryColor.opacity(isPressed ? 0.2 : 0.4),
-                            radius: isPressed ? 4 : 8,
-                            x: 0,
-                            y: isPressed ? 2 : 4
-                        )
                     
                     Image(systemName: "plus")
                         .font(.system(size: 24, weight: .bold))
