@@ -121,7 +121,6 @@ struct MainTabScreens: View {
                     get: { activeCreationMode == .scan },
                     set: { if !$0 { activeCreationMode = nil } }
                 )) {
-                    // Tạm thời để placeholder, lát nữa ta thế ReceiptScannerSheet vào đây
                     VStack(spacing: 16) {
                         Image(systemName: "doc.viewfinder")
                             .font(.system(size: 60))

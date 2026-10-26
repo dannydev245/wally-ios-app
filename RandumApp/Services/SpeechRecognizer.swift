@@ -22,7 +22,6 @@ final class SpeechRecognizer: ObservableObject {
     private var speechRecognizer: SFSpeechRecognizer?
     
     func startRecording(locale: Locale) {
-        // Khởi tạo nhận diện theo locale của app
         speechRecognizer = SFSpeechRecognizer(locale: locale)
         
         guard let speechRecognizer = speechRecognizer, speechRecognizer.isAvailable else {
@@ -30,7 +29,6 @@ final class SpeechRecognizer: ObservableObject {
             return
         }
         
-        // Yêu cầu cấp quyền
         SFSpeechRecognizer.requestAuthorization { [weak self] authStatus in
             Task { @MainActor in
                 guard let self = self else { return }
@@ -51,14 +49,12 @@ final class SpeechRecognizer: ObservableObject {
     private func beginAudioSession() {
         stopRecording()
         
-        // Đẩy việc kích hoạt Audio Session và khởi chạy Engine sang Background Thread
         Task.detached(priority: .userInitiated) { [weak self] in
             guard let self = self else { return }
             
             let audioSession = AVAudioSession.sharedInstance()
             do {
                 try audioSession.setCategory(.record, mode: .measurement, options: .duckOthers)
-                // Không dùng 'await' vì setActive là synchronous API
                 try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
             } catch {
                 await MainActor.run {
@@ -89,7 +85,6 @@ final class SpeechRecognizer: ObservableObject {
                 return
             }
             
-            // Cập nhật state và gán task trên Main Thread
             await MainActor.run {
                 self.audioEngine = engine
                 self.recognitionRequest = request
@@ -127,7 +122,6 @@ final class SpeechRecognizer: ObservableObject {
         
         isRecording = false
         
-        // Deactivate audio session ở background thread
         Task.detached(priority: .background) {
             try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
         }

@@ -68,3 +68,13 @@ struct ActivityView: UIViewControllerRepresentable {
     
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
+
+// MARK: - ScaleButtonStyle
+struct ScaleButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.88 : 1.0)
+            .opacity(configuration.isPressed ? 0.8 : 1.0)
+            .animation(.easeInOut(duration: 0.12), value: configuration.isPressed)
+    }
+}
