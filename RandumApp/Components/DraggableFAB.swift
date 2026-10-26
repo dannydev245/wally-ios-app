@@ -10,13 +10,12 @@ import SwiftUI
 struct DraggableFAB: View {
     @ObservedObject private var themeManager = ThemeManager.shared
     
-    var onTap: () -> Void
+    var onSelectMode: (TransactionCreationMode) -> Void
     
     private let buttonSize: CGFloat = 58
     
     @State private var dragOffset: CGSize = .zero
     @State private var currentTranslation: CGSize = .zero
-    
     @State private var isPressed: Bool = false
     
     var body: some View {
@@ -24,35 +23,61 @@ struct DraggableFAB: View {
             let screenWidth = geometry.size.width
             let screenHeight = geometry.size.height
             let safeArea = geometry.safeAreaInsets
-           
+            
             let maxLeftOffset = -(screenWidth - buttonSize - 40)
             let maxTopOffset = -(screenHeight - buttonSize - safeArea.top - safeArea.bottom - 40)
             
-            ZStack {
-                Circle()
-                    .fill(themeManager.currentAccent.primaryColor)
-                    .frame(width: buttonSize, height: buttonSize)
-                    .shadow(
-                        color: themeManager.currentAccent.primaryColor.opacity(isPressed ? 0.2 : 0.4),
-                        radius: isPressed ? 4 : 8,
-                        x: 0,
-                        y: isPressed ? 2 : 4
-                    )
+            Menu {
+                // 1. Quét hóa đơn
+                Button {
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                    onSelectMode(.scan)
+                } label: {
+                    Label("Scan Receipt", systemImage: "doc.viewfinder")
+                }
                 
-                Image(systemName: "plus")
-                    .font(.system(size: 24, weight: .bold))
-                    .foregroundStyle(.white)
+                // 2. Nhập giọng nói
+                Button {
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                    onSelectMode(.voice)
+                } label: {
+                    Label("Voice Input", systemImage: "mic.fill")
+                }
+                
+                // 3. Nhập thủ công
+                Button {
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                    onSelectMode(.manual)
+                } label: {
+                    Label("Manual Input", systemImage: "square.and.pencil")
+                }
+            } label: {
+                ZStack {
+                    Circle()
+                        .fill(themeManager.currentAccent.primaryColor)
+                        .frame(width: buttonSize, height: buttonSize)
+                        .shadow(
+                            color: themeManager.currentAccent.primaryColor.opacity(isPressed ? 0.2 : 0.4),
+                            radius: isPressed ? 4 : 8,
+                            x: 0,
+                            y: isPressed ? 2 : 4
+                        )
+                    
+                    Image(systemName: "plus")
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundStyle(.white)
+                }
+                .opacity(isPressed ? 0.85 : 1.0)
+                .scaleEffect(isPressed ? 0.94 : 1.0)
+                .animation(.easeInOut(duration: 0.15), value: isPressed)
             }
-            .opacity(isPressed ? 0.82 : 1.0)
-            .scaleEffect(isPressed ? 0.92 : 1.0)
-            .animation(.easeInOut(duration: 0.15), value: isPressed)
             .contentShape(Circle())
             .offset(
                 x: dragOffset.width + currentTranslation.width,
                 y: dragOffset.height + currentTranslation.height
             )
-            .gesture(
-                DragGesture(minimumDistance: 0)
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 5)
                     .onChanged { value in
                         if !isPressed {
                             isPressed = true
@@ -62,25 +87,14 @@ struct DraggableFAB: View {
                     .onEnded { value in
                         isPressed = false
                         
-                        let dragDistance = hypot(value.translation.width, value.translation.height)
-                        
-                        // 1. Click / Tap
-                        if dragDistance < 2 {
-                            currentTranslation = .zero
-                            let generator = UIImpactFeedbackGenerator(style: .medium)
-                            generator.impactOccurred()
-                            onTap()
-                            return
-                        }
-                        
-                        // 2. Drag
                         var finalX = dragOffset.width + value.translation.width
                         var finalY = dragOffset.height + value.translation.height
                         
-                        // Limitation prevent out of screen
+                        // Giới hạn trong khung màn hình
                         finalX = min(max(finalX, maxLeftOffset), 0)
                         finalY = min(max(finalY, maxTopOffset), 0)
                         
+                        // Hít vào cạnh trái/phải gần nhất
                         let midX = maxLeftOffset / 2
                         let targetX: CGFloat = finalX < midX ? maxLeftOffset : 0
                         
@@ -100,7 +114,7 @@ struct DraggableFAB: View {
 #Preview {
     ZStack {
         Color.gray.opacity(0.1).ignoresSafeArea()
-        DraggableFAB {
+        DraggableFAB { mode in
             print("Tapped FAB")
         }
     }

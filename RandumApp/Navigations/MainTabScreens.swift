@@ -18,6 +18,8 @@ struct MainTabScreens: View {
     @StateObject private var transactionsViewModel = TransactionsViewModel()
     @EnvironmentObject private var userManager: UserManager
     
+    @State private var activeCreationMode: TransactionCreationMode? = nil
+    
     var body: some View {
         Group{
             if userManager.currentUser != nil {
@@ -76,16 +78,17 @@ struct MainTabScreens: View {
                     
                     let shouldShowFAB = selectedTab == .home || selectedTab == .transactions
                     
-                    //                    if selectedTab == .home || selectedTab == .transactions {
-                    DraggableFAB {
-                        showCreateSheet = true
+                    DraggableFAB { mode in
+                        activeCreationMode = mode
                     }
                     .transition(.scale.combined(with: .opacity))
                     .opacity(shouldShowFAB ? 1 : 0)
                     .allowsHitTesting(shouldShowFAB)
-                    //                    }
                 }
-                .sheet(isPresented: $showCreateSheet) {
+                .sheet(isPresented: Binding(
+                    get: { activeCreationMode == .manual },
+                    set: { if !$0 { activeCreationMode = nil } }
+                )) {
                     TransactionFormSheet(transactionToEdit: nil) { title, amount, date, type, category in
                         transactionsViewModel.addTransaction(
                             title: title,
@@ -96,6 +99,40 @@ struct MainTabScreens: View {
                         )
                     }
                     .presentationDetents([.fraction(0.68), .large])
+                    .presentationDragIndicator(.visible)
+                }
+
+                // 2. Sheet Voice Input (Chuẩn bị làm)
+                .sheet(isPresented: Binding(
+                    get: { activeCreationMode == .voice },
+                    set: { if !$0 { activeCreationMode = nil } }
+                )) {
+                    // Tạm thời để placeholder, lát nữa ta thế VoiceRecordingSheet vào đây
+                    VStack(spacing: 16) {
+                        Image(systemName: "mic.circle.fill")
+                            .font(.system(size: 60))
+                            .foregroundStyle(themeManager.currentAccent.primaryColor)
+                        Text("Voice Input Sheet")
+                            .font(.headline)
+                    }
+                    .presentationDetents([.height(280)])
+                    .presentationDragIndicator(.visible)
+                }
+
+                // 3. Sheet Scan Receipt (Chuẩn bị làm)
+                .sheet(isPresented: Binding(
+                    get: { activeCreationMode == .scan },
+                    set: { if !$0 { activeCreationMode = nil } }
+                )) {
+                    // Tạm thời để placeholder, lát nữa ta thế ReceiptScannerSheet vào đây
+                    VStack(spacing: 16) {
+                        Image(systemName: "doc.viewfinder")
+                            .font(.system(size: 60))
+                            .foregroundStyle(themeManager.currentAccent.primaryColor)
+                        Text("Receipt Scanner Sheet")
+                            .font(.headline)
+                    }
+                    .presentationDetents([.medium, .large])
                     .presentationDragIndicator(.visible)
                 }
                 
