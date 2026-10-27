@@ -13,7 +13,7 @@ struct VoiceRecordingSheet: View {
     @StateObject private var speechRecognizer = SpeechRecognizer()
     
     var onFinishedSpeaking: (String) -> Void
-        
+    
     var body: some View {
         VStack(spacing: 20) {
             Text(speechRecognizer.isRecording ? "Listening..." : "Tap mic to speak")
@@ -70,10 +70,19 @@ struct VoiceRecordingSheet: View {
             }
         }
         .padding()
+        .tint(themeManager.currentAccent.primaryColor)
+        .onAppear {
+            speechRecognizer.onSilenceDetected = { finalText in
+                if !finalText.trimmingCharacters(in: .whitespaces).isEmpty {
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                    onFinishedSpeaking(finalText)
+                }
+            }
+            speechRecognizer.startRecording(locale: themeManager.currentLanguage.locale)
+        }
         .onDisappear {
             speechRecognizer.stopRecording()
         }
-        .tint(themeManager.currentAccent.primaryColor)
     }
 }
 

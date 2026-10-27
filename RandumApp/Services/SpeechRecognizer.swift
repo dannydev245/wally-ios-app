@@ -16,10 +16,15 @@ final class SpeechRecognizer: ObservableObject {
     @Published var isRecording: Bool = false
     @Published var errorMessage: String?
     
+    var onSilenceDetected: ((String) -> Void)?
+    
     private var audioEngine: AVAudioEngine?
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
     private var speechRecognizer: SFSpeechRecognizer?
+    
+    private var silenceTimerTask: Task<Void, Never>?
+    private let silenceThreshold: TimeInterval = 1.8 // Stop after 1.8s silent
     
     func startRecording(locale: Locale) {
         speechRecognizer = SFSpeechRecognizer(locale: locale)
@@ -96,7 +101,13 @@ final class SpeechRecognizer: ObservableObject {
                     guard let self = self else { return }
                     
                     if let result = result {
-                        self.transcript = result.bestTranscription.formattedString
+                        let text = result.bestTranscription.formattedString
+                        self.transcript = text
+                        
+                        // Restart the timer whenever a new word is detected
+                        if !text.trimmingCharacters(in: .whitespaces).isEmpty {
+                            self.resetSilenceTimer()
+                        }
                     }
                     
                     if error != nil || (result?.isFinal ?? false) {
@@ -106,8 +117,29 @@ final class SpeechRecognizer: ObservableObject {
             }
         }
     }
-
+    
+    private func resetSilenceTimer() {
+        silenceTimerTask?.cancel()
+        silenceTimerTask = Task { [weak self] in
+            guard let self = self else { return }
+            do {
+                try await Task.sleep(nanoseconds: UInt64(self.silenceThreshold * 1_000_000_000))
+                
+                if !Task.isCancelled && self.isRecording {
+                    let finalText = self.transcript
+                    self.stopRecording()
+                    self.onSilenceDetected?(finalText)
+                }
+            } catch {
+                // The task is canceled when the user continues by speaking the next word.
+            }
+        }
+    }
+    
     func stopRecording() {
+        silenceTimerTask?.cancel()
+        silenceTimerTask = nil
+        
         if let engine = audioEngine, engine.isRunning {
             engine.stop()
             engine.inputNode.removeTap(onBus: 0)
