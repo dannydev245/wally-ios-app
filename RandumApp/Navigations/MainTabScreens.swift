@@ -19,6 +19,7 @@ struct MainTabScreens: View {
     @EnvironmentObject private var userManager: UserManager
     
     @State private var activeCreationMode: TransactionCreationMode? = nil
+    @State private var smartConfirmResult: ParsedTransactionResult? = nil
     
     var body: some View {
         Group{
@@ -85,6 +86,7 @@ struct MainTabScreens: View {
                     .opacity(shouldShowFAB ? 1 : 0)
                     .allowsHitTesting(shouldShowFAB)
                 }
+                // 2. Sheet Manual Input
                 .sheet(isPresented: Binding(
                     get: { activeCreationMode == .manual },
                     set: { if !$0 { activeCreationMode = nil } }
@@ -101,21 +103,20 @@ struct MainTabScreens: View {
                     .presentationDetents([.fraction(0.68), .large])
                     .presentationDragIndicator(.visible)
                 }
-
-                // 2. Sheet Voice Input (Chuẩn bị làm)
+                // 2. Sheet Voice Input
                 .sheet(isPresented: Binding(
                     get: { activeCreationMode == .voice },
                     set: { if !$0 { activeCreationMode = nil } }
                 )) {
-                    VoiceRecordingSheet { transcript in
+                    VoiceRecordingSheet { result in
                         activeCreationMode = nil
-                        print("Đoạn text vừa nói: \(transcript)")
-                        // Bước tiếp theo: Đưa transcript này qua hàm parse để mở Smart Confirm Card
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                            smartConfirmResult = result
+                        }
                     }
-                    .presentationDetents([.height(300)])
+                    .presentationDetents([.fraction(0.48)])
                     .presentationDragIndicator(.hidden)
                 }
-
                 // 3. Sheet Scan Receipt (Chuẩn bị làm)
                 .sheet(isPresented: Binding(
                     get: { activeCreationMode == .scan },
@@ -131,7 +132,20 @@ struct MainTabScreens: View {
                     .presentationDetents([.medium, .large])
                     .presentationDragIndicator(.visible)
                 }
-                
+                // Sheet Smart Confirm
+                .sheet(item: $smartConfirmResult) { result in
+                    SmartConfirmSheet(parsedResult: result) { confirmedResult in
+                        transactionsViewModel.addTransaction(
+                            title: confirmedResult.title,
+                            amount: confirmedResult.amount,
+                            date: confirmedResult.date,
+                            type: confirmedResult.type,
+                            category: confirmedResult.category
+                        )
+                    }
+                    .presentationDetents([.fraction(0.5)])
+                    .presentationDragIndicator(.hidden)
+                }
             } else {
                 ProgressView()
             }

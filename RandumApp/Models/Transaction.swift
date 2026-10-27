@@ -22,45 +22,87 @@ enum TransactionType: String, CaseIterable, Codable, Identifiable {
 }
 
 enum TransactionCategory: String, CaseIterable, Codable, Identifiable {
-    // Expense Categories
-    case shopping = "Shopping"
+    // MARK: - Expense Categories
     case food = "Food & Beverage"
+    case shopping = "Shopping"
     case transport = "Transportation"
     case bills = "Bills & Utilities"
+    case housing = "Housing"
     case entertainment = "Entertainment"
+    case sports = "Sports & Fitness"
+    case health = "Health & Medical"
+    case education = "Education"
+    case travel = "Travel"
+    case personalCare = "Personal Care"
+    case giftsDonations = "Gifts & Donations"
     
-    // Income Categories
+    // MARK: - Income Categories
     case salary = "Salary"
     case bonus = "Bonus"
     case investment = "Investment"
+    case freelance = "Freelance & Side Hustle"
+    case allowance = "Allowance & Gifts"
+    case rentalIncome = "Rental Income"
+    
+    // MARK: - General / Other
     case other = "Other"
     
     var id: String { rawValue }
     
     var localizedTitle: LocalizedStringResource {
         switch self {
-        case .shopping: return "Shopping"
+            // Expense
         case .food: return "Food & Beverage"
+        case .shopping: return "Shopping"
         case .transport: return "Transportation"
         case .bills: return "Bills & Utilities"
+        case .housing: return "Housing"
         case .entertainment: return "Entertainment"
+        case .sports: return "Sports & Fitness"
+        case .health: return "Health & Medical"
+        case .education: return "Education"
+        case .travel: return "Travel"
+        case .personalCare: return "Personal Care"
+        case .giftsDonations: return "Gifts & Donations"
+            
+            // Income
         case .salary: return "Salary"
         case .bonus: return "Bonus"
         case .investment: return "Investment"
+        case .freelance: return "Freelance & Side Hustle"
+        case .allowance: return "Allowance & Gifts"
+        case .rentalIncome: return "Rental Income"
+            
+            // Other
         case .other: return "Other"
         }
     }
     
     var iconName: String {
         switch self {
+            // Expense
         case .food: return "fork.knife"
         case .shopping: return "cart.fill"
         case .transport: return "car.fill"
-        case .bills: return "doc.text.fill"
-        case .entertainment: return "film.fill"
+        case .bills: return "bolt.fill"
+        case .housing: return "house.fill"
+        case .entertainment: return "tv.fill"
+        case .sports: return "figure.run"
+        case .health: return "cross.case.fill"
+        case .education: return "book.closed.fill"
+        case .travel: return "airplane"
+        case .personalCare: return "sparkles"
+        case .giftsDonations: return "gift.fill"
+            
+            // Income
         case .salary: return "banknote.fill"
-        case .bonus: return "gift.fill"
+        case .bonus: return "star.circle.fill"
         case .investment: return "chart.line.uptrend.xyaxis"
+        case .freelance: return "laptopcomputer"
+        case .allowance: return "hand.thumbsup.fill"
+        case .rentalIncome: return "building.2.fill"
+            
+            // Other
         case .other: return "ellipsis.circle.fill"
         }
     }
@@ -69,9 +111,31 @@ enum TransactionCategory: String, CaseIterable, Codable, Identifiable {
     static func categories(for type: TransactionType) -> [TransactionCategory] {
         switch type {
         case .expense:
-            return [.shopping, .food, .transport, .bills, .entertainment, .other]
+            return [
+                .food,
+                .shopping,
+                .transport,
+                .bills,
+                .housing,
+                .entertainment,
+                .sports,
+                .health,
+                .education,
+                .travel,
+                .personalCare,
+                .giftsDonations,
+                .other
+            ]
         case .income:
-            return [.salary, .bonus, .investment, .other]
+            return [
+                .salary,
+                .bonus,
+                .investment,
+                .freelance,
+                .rentalIncome,
+                .allowance,
+                .other
+            ]
         }
     }
 }
@@ -89,4 +153,13 @@ struct TransactionGroup: Identifiable {
     let id = UUID()
     let date: Date
     let items: [TransactionItem]
+}
+
+struct ParsedTransactionResult: Identifiable {
+    var id = UUID()
+    var title: String
+    var amount: Double
+    var type: TransactionType
+    var category: TransactionCategory
+    var date: Date = Date()
 }

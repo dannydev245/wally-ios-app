@@ -12,7 +12,13 @@ struct VoiceRecordingSheet: View {
     @ObservedObject private var themeManager = ThemeManager.shared
     @StateObject private var speechRecognizer = SpeechRecognizer()
     
-    var onFinishedSpeaking: (String) -> Void
+    var onParsedSuccessfully: (ParsedTransactionResult) -> Void
+    
+    @State private var parsingError: String? = nil
+    
+    private var isVietnamese: Bool {
+        themeManager.currentLanguage.locale.identifier.hasPrefix("vi")
+    }
     
     var body: some View {
         VStack(spacing: 20) {
@@ -37,9 +43,28 @@ struct VoiceRecordingSheet: View {
                     .frame(minHeight: 54)
             }
             
+            if let error = parsingError {
+                HStack(spacing: 8) {
+                    Image(systemName: "exclamationmark.circle.fill")
+                        .font(.system(size: 14, weight: .semibold))
+                        .padding(.top, 1)
+                    Text(error)
+                        .font(.system(size: 13, weight: .medium))
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .foregroundStyle(.orange)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(Color.orange.opacity(0.12))
+                )
+                .transition(.opacity.combined(with: .scale(scale: 0.95)))
+            }
+            
             Spacer()
             
-            // Nút Micro chính giữa kèm hiệu ứng sóng âm (Pulsing)
             ZStack {
                 if speechRecognizer.isRecording {
                     PulsingWaveRing(color: themeManager.currentAccent.primaryColor)
@@ -49,11 +74,9 @@ struct VoiceRecordingSheet: View {
                     UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                     if speechRecognizer.isRecording {
                         speechRecognizer.stopRecording()
-                        if !speechRecognizer.transcript.trimmingCharacters(in: .whitespaces).isEmpty {
-                            onFinishedSpeaking(speechRecognizer.transcript)
-                        }
+                        processTranscript(speechRecognizer.transcript)
                     } else {
-                        speechRecognizer.startRecording(locale: themeManager.currentLanguage.locale)
+                        startRecording()
                     }
                 } label: {
                     ZStack {
@@ -73,21 +96,43 @@ struct VoiceRecordingSheet: View {
         .tint(themeManager.currentAccent.primaryColor)
         .onAppear {
             speechRecognizer.onSilenceDetected = { finalText in
-                if !finalText.trimmingCharacters(in: .whitespaces).isEmpty {
-                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                    onFinishedSpeaking(finalText)
-                }
+                processTranscript(finalText)
             }
-            speechRecognizer.startRecording(locale: themeManager.currentLanguage.locale)
         }
         .onDisappear {
             speechRecognizer.stopRecording()
         }
     }
+    
+    private func startRecording() {
+        withAnimation {
+            parsingError = nil
+        }
+        speechRecognizer.startRecording(locale: themeManager.currentLanguage.locale)
+    }
+    
+    private func processTranscript(_ text: String) {
+        guard !text.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+        
+        let result = VoiceTransactionParser.parse(text: text)
+        
+        if result.amount > 0 {
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+            onParsedSuccessfully(result)
+        } else {
+            UINotificationFeedbackGenerator().notificationOccurred(.warning)
+            
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
+                parsingError = isVietnamese
+                ? "Không tìm thấy số tiền. Hãy thử lại (vd: 'Cà phê 35k')"
+                : "Could not detect amount. Try again (e.g. 'Coffee 5 dollars')"
+            }
+        }
+    }
 }
 
 #Preview {
-    VoiceRecordingSheet(onFinishedSpeaking:{
+    VoiceRecordingSheet(onParsedSuccessfully:{
         string in
         print("abc")
     })
