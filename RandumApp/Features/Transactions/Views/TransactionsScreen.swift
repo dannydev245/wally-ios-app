@@ -87,30 +87,16 @@ struct TransactionsScreen: View {
                                             }
                                         }
                                     } label: {
-                                        ZStack(alignment: .topTrailing) {
-                                            Image(systemName: isFilterActive ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
-                                                .font(.system(size: 18, weight: .medium))
-                                                .foregroundStyle(isFilterActive ? .white : AppColors.textPrimary)
-                                                .frame(width: 36, height: 36)
-                                                .background(
-                                                    isFilterActive
-                                                    ? themeManager.currentAccent.primaryColor
-                                                    : themeManager.currentAccent.inputBackgroundColor
-                                                )
-                                                .clipShape(Circle())
-                                            
-                                            if isFilterActive {
-                                                Circle()
-                                                    .fill(Color.white)
-                                                    .frame(width: 14, height: 14)
-                                                    .overlay(
-                                                        Text("1")
-                                                            .font(.system(size: 9, weight: .heavy))
-                                                            .foregroundStyle(themeManager.currentAccent.primaryColor)
-                                                    )
-                                                    .offset(x: 2, y: -2)
-                                            }
-                                        }
+                                        Image(systemName: isFilterActive ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
+                                            .font(.system(size: 18, weight: .medium))
+                                            .foregroundStyle(isFilterActive ? .white : AppColors.textPrimary)
+                                            .frame(width: 36, height: 36)
+                                            .background(
+                                                isFilterActive
+                                                ? themeManager.currentAccent.primaryColor
+                                                : themeManager.currentAccent.inputBackgroundColor
+                                            )
+                                            .clipShape(Circle())
                                     }
                                     .buttonStyle(.plain)
                                 }
@@ -205,7 +191,6 @@ struct TransactionsScreen: View {
                 }
                 .presentationDetents([.fraction(0.68), .large])
                 .presentationDragIndicator(.visible)
-                //                .presentationDetents([.height(520)])
             }
         }
         .tint(themeManager.currentAccent.primaryColor)
