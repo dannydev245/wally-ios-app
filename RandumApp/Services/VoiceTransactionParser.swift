@@ -56,7 +56,7 @@ struct VoiceTransactionParser {
     private static func extractAmount(from text: String) -> (Double, String?) {
         var workingText = text.lowercased()
         
-        // 1. Chuẩn hóa lỗi phát âm (gưỡi -> rưỡi) và các từ lóng
+        // 1. Correcting pronunciation errors (e.g., "gưỡi" to "rưỡi") and slang terms
         workingText = workingText
             .replacingOccurrences(of: "gưỡi", with: "rưỡi")
             .replacingOccurrences(of: "tỉ", with: "tỷ")
@@ -64,8 +64,9 @@ struct VoiceTransactionParser {
             .replacingOccurrences(of: "củ", with: "triệu")
             .replacingOccurrences(of: "lít", with: "trăm")
             .replacingOccurrences(of: "chục", with: "0k")
+            .replacingOccurrences(of: "\\bca\\b", with: "k", options: .regularExpression)
         
-        // 2. Fix bug riêng của Apple Speech: "1.000.000.0rưỡi" hoặc "1.000.000.00rưỡi" -> chuẩn hóa thành 1.000.000.000rưỡi
+        // 2. Fix an Apple Speech-specific bug: "1.000.000.0rưỡi" or "1.000.000.00rưỡi" -> normalized to 1.000.000.000rưỡi
         let appleBillionGlitchPattern = #"(\d+[\.,]\d{3}[\.,]\d{3}[\.,])0{1,2}rưỡi"#
         if let glitchRegex = try? NSRegularExpression(pattern: appleBillionGlitchPattern) {
             let nsString = workingText as NSString
@@ -77,7 +78,7 @@ struct VoiceTransactionParser {
             )
         }
         
-        // 3. Xử lý các số đã bị Apple format dính liền chữ rưỡi: vd "30.000rưỡi", "1.000.000rưỡi", "12.000.000.000rưỡi"
+        // 3. Handle numerical values ​​that have been formatted by Apple with the term "rưỡi" (meaning "and a half") appended directly to them—for example: "30.000rưỡi", "1.000.000rưỡi", and "12.000.000.000rưỡi".
         let formattedRuoiPattern = #"(\d+(?:[\.,]\d{1,3})+)\s*rưỡi"#
         if let regex = try? NSRegularExpression(pattern: formattedRuoiPattern) {
             let nsString = workingText as NSString
@@ -89,25 +90,37 @@ struct VoiceTransactionParser {
                 
                 if let baseNumber = Double(rawNumberStr) {
                     var bonus: Double = 0
-                    if baseNumber >= 1_000_000_000 {
-                        // Cấp Tỷ: rưỡi = + 500 triệu (vd: 12 tỷ rưỡi -> 12.500.000.000)
+                    
+                    // Find the next smallest base unit to halve (0.5)
+                    // Examples:
+                    // 300,000,000 (Hundreds of millions) -> bonus = 50,000,000
+                    // 1,000,000   (Millions)            -> bonus = 500,000
+                    // 300,000     (Hundreds of thousands) -> bonus = 50,000
+                    // 30,000      (Thousands)   ​​        -> bonus = 500
+                    
+                    switch baseNumber {
+                    case 100_000_000_000...: // Trăm tỷ trở lên
+                        bonus = 50_000_000_000
+                    case 1_000_000_000...:   // Hàng Tỷ (1 tỷ rưỡi -> 1.5 tỷ)
                         bonus = 500_000_000
-                    } else if baseNumber >= 1_000_000 {
-                        // Cấp Triệu: rưỡi = + 500 nghìn (vd: 1 triệu rưỡi -> 1.500.000)
+                    case 100_000_000...:     // Trăm Triệu (300 triệu rưỡi -> 350 triệu)
+                        bonus = 50_000_000
+                    case 1_000_000...:       // Triệu (1 triệu rưỡi, 12 triệu rưỡi)
                         bonus = 500_000
-                    } else if baseNumber >= 10_000 {
-                        // Cấp Chục nghìn: rưỡi = + 5 nghìn (vd: 30 ngàn rưỡi -> 35.000)
-                        bonus = 5_000
-                    } else if baseNumber >= 1_000 {
-                        // Cấp Nghìn: rưỡi = + 500 đồng
+                    case 100_000...:         // Trăm Nghìn (300k rưỡi -> 350k)
+                        bonus = 50_000
+                    case 1_000...:           // Nghìn (30k rưỡi -> 30.500)
                         bonus = 500
+                    default:
+                        bonus = 0.5
                     }
+                    
                     return (baseNumber + bonus, fullMatchedString)
                 }
             }
         }
         
-        // 4. Case có đơn vị rõ ràng trước chữ "rưỡi": vd "3 triệu rưỡi", "1 tỷ rưỡi", "12 tỷ rưỡi"
+        // 4. Cases where a specific unit precedes the term "rưỡi" (half): e.g., "3 million and a half," "1 billion and a half," "12 billion and a half."
         let unitRuoiPattern = #"(\d+(?:[\.,]\d+)?)\s*(tỷ|triệu|tr|trăm|k|nghìn)\s*rưỡi"#
         if let regex = try? NSRegularExpression(pattern: unitRuoiPattern) {
             let nsString = workingText as NSString
@@ -135,7 +148,7 @@ struct VoiceTransactionParser {
             }
         }
         
-        // 5. Case số thông thường (1.000.000.000, 1.000.000, 50k, 12 tỷ, ...)
+        // 5. Standard numerical formats (1.000.000.000, 1.000.000, 50k, 12 tỷ, ...)
         let standardPattern = #"(\d+(?:[\.,]\d+)*)\s*(tỷ|triệu|tr|nghìn|trăm|k|m|b|vnd|vnđ|đ)?"#
         guard let standardRegex = try? NSRegularExpression(pattern: standardPattern) else {
             return (0, nil)
