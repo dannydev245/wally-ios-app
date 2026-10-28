@@ -17,6 +17,7 @@ struct VoiceTransactionParser {
             .replacingOccurrences(of: "ngàn", with: "nghìn")
             .replacingOccurrences(of: "củ", with: "triệu")
             .replacingOccurrences(of: "lít", with: "trăm")
+            .replacingOccurrences(of: "l", with: "trăm")
             .replacingOccurrences(of: "chục", with: "0k")
             .replacingOccurrences(of: "\\bca\\b", with: "k", options: .regularExpression)
             .replacingOccurrences(of: "bucks", with: "dollars")

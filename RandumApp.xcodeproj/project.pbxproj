@@ -277,7 +277,9 @@
 				INFOPLIST_FILE = RandumApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Wally;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access to scan receipts.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access is required to record audio and create transactions using your voice.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need photo library access to choose receipt photos.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Voice recognition permission is required to convert your speech into expense information.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -326,7 +328,9 @@
 				INFOPLIST_FILE = RandumApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Wally;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access to scan receipts.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access is required to record audio and create transactions using your voice.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need photo library access to choose receipt photos.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Voice recognition permission is required to convert your speech into expense information.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;

@@ -117,20 +117,17 @@ struct MainTabScreens: View {
                     .presentationDetents([.fraction(0.48)])
                     .presentationDragIndicator(.hidden)
                 }
-                // 3. Sheet Scan Receipt (Chuẩn bị làm)
-                .sheet(isPresented: Binding(
+                // 3. FullScreen Cover Scan Receipt
+                .fullScreenCover(isPresented: Binding(
                     get: { activeCreationMode == .scan },
                     set: { if !$0 { activeCreationMode = nil } }
                 )) {
-                    VStack(spacing: 16) {
-                        Image(systemName: "doc.viewfinder")
-                            .font(.system(size: 60))
-                            .foregroundStyle(themeManager.currentAccent.primaryColor)
-                        Text("Receipt Scanner Sheet")
-                            .font(.headline)
+                    ReceiptScannerSheet { result in
+                        activeCreationMode = nil
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                            smartConfirmResult = result
+                        }
                     }
-                    .presentationDetents([.medium, .large])
-                    .presentationDragIndicator(.visible)
                 }
                 // Sheet Smart Confirm
                 .sheet(item: $smartConfirmResult) { result in
