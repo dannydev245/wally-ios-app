@@ -9,8 +9,11 @@ import SwiftUI
 import VisionKit
 
 struct DocumentCameraView: UIViewControllerRepresentable {
-    var onScan: (UIImage) -> Void
+    var onScan: ([UIImage]) -> Void
     var onCancel: () -> Void
+    
+    // Giới hạn an toàn: Tối đa 3 trang để bảo vệ RAM & CPU
+    private let maxScanPages = 3
     
     func makeUIViewController(context: Context) -> VNDocumentCameraViewController {
         let scanner = VNDocumentCameraViewController()
@@ -21,14 +24,16 @@ struct DocumentCameraView: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: VNDocumentCameraViewController, context: Context) {}
     
     func makeCoordinator() -> Coordinator {
-        Coordinator(onScan: onScan, onCancel: onCancel)
+        Coordinator(maxPages: maxScanPages, onScan: onScan, onCancel: onCancel)
     }
     
     class Coordinator: NSObject, VNDocumentCameraViewControllerDelegate {
-        var onScan: (UIImage) -> Void
+        let maxPages: Int
+        var onScan: ([UIImage]) -> Void
         var onCancel: () -> Void
         
-        init(onScan: @escaping (UIImage) -> Void, onCancel: @escaping () -> Void) {
+        init(maxPages: Int, onScan: @escaping ([UIImage]) -> Void, onCancel: @escaping () -> Void) {
+            self.maxPages = maxPages
             self.onScan = onScan
             self.onCancel = onCancel
         }
@@ -38,8 +43,16 @@ struct DocumentCameraView: UIViewControllerRepresentable {
                 onCancel()
                 return
             }
-            let firstPageImage = scan.imageOfPage(at: 0)
-            onScan(firstPageImage)
+            
+            // Chỉ lấy tối đa 3 trang đầu tiên
+            let processCount = min(scan.pageCount, maxPages)
+            var scannedImages: [UIImage] = []
+            
+            for index in 0..<processCount {
+                scannedImages.append(scan.imageOfPage(at: index))
+            }
+            
+            onScan(scannedImages)
         }
         
         func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {

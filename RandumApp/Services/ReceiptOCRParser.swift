@@ -8,15 +8,13 @@
 import Foundation
 
 struct ReceiptOCRParser {
-    
-    /// Parses an array of recognized text lines from Vision OCR into a transaction result
     static func parse(recognizedLines: [String]) -> ParsedTransactionResult {
         let cleanedLines = recognizedLines
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
         
-        let amount = extractTotalAmount(from: cleanedLines)
         let title = extractMerchantTitle(from: cleanedLines)
+        let amount = extractTotalAmount(from: cleanedLines)
         let category = detectCategory(from: cleanedLines, title: title)
         let date = extractDate(from: cleanedLines) ?? Date()
         
@@ -31,55 +29,76 @@ struct ReceiptOCRParser {
     
     // MARK: - Amount Extraction
     private static func extractTotalAmount(from lines: [String]) -> Double {
-        // Priority 1: Target anchor keywords indicating total amounts
-        let totalKeywords = [
-            "tổng cộng", "tong cong", "thanh toán", "thanh toan", "tổng tiền",
-            "tong tien", "thành tiền", "thanh tien", "cần thanh toán", "tong", "tổng",
-            "total", "amount due", "grand total", "balance due", "net amount", "total due"
+        let normalizedLines = lines.map { removeAccents(from: $0.lowercased()) }
+        
+        // Từ khóa ưu tiên của khối tính tiền / thanh toán
+        let targetKeywords = [
+            "thanh tien", "thanh toan", "zalopay", "momo", "vnpay",
+            "tien mat", "cash", "visa", "master", "chuyen khoan",
+            "tong tien", "tong cong", "total", "amount due", "grand total"
         ]
         
-        // Scan backwards as totals typically sit at the bottom of receipts
-        for (index, line) in lines.enumerated().reversed() {
-            let lowerLine = line.lowercased()
-            if totalKeywords.contains(where: { lowerLine.contains($0) }) {
-                // Try extracting amount on the same line
-                if let amount = extractNumber(from: line), amount > 0 {
+        // 1. Dò theo khối từ khóa thanh toán (duyệt từ dưới lên)
+        for (index, line) in normalizedLines.enumerated().reversed() {
+            if targetKeywords.contains(where: { line.contains($0) }) {
+                // Kiểm tra trực tiếp trên cùng dòng
+                if let amount = extractValidCurrency(from: lines[index]) {
                     return amount
                 }
                 
-                // If not inline, look ahead to the next 2 lines
-                for offset in 1...2 {
+                // Thu thập các số tiền nằm trong 6 dòng phía sau (xử lý hóa đơn chia cột)
+                var candidateAmounts: [Double] = []
+                for offset in 1...6 {
                     let nextIndex = index + offset
                     if nextIndex < lines.count {
-                        if let amount = extractNumber(from: lines[nextIndex]), amount > 0 {
-                            return amount
+                        let nextNormLine = normalizedLines[nextIndex]
+                        
+                        // Bỏ qua các dòng nhãn hệ thống, điểm thưởng
+                        if isMetadataLine(nextNormLine) {
+                            continue
+                        }
+                        
+                        if let amount = extractValidCurrency(from: lines[nextIndex]) {
+                            candidateAmounts.append(amount)
                         }
                     }
                 }
-            }
-        }
-        
-        // Priority 2: Fallback to largest detected valid currency value
-        var maxAmount: Double = 0
-        for line in lines {
-            if let amount = extractNumber(from: line) {
-                // Exclude likely phone numbers, tax IDs, or barcodes
-                if amount > maxAmount && amount < 100_000_000_000 {
-                    let clean = line.replacingOccurrences(of: "[^0-9]", with: "", options: .regularExpression)
-                    // Skip 10-digit phone number patterns starting with 0
-                    if !(clean.count == 10 && clean.hasPrefix("0")) {
-                        maxAmount = amount
-                    }
+                
+                // Con số cuối cùng trong khối thanh toán chính là số tiền chốt sổ sau giảm giá
+                if let finalAmount = candidateAmounts.last {
+                    return finalAmount
                 }
             }
         }
         
-        return maxAmount
+        // 2. Fallback: Nếu không bắt được nhãn, quét các con số tiền hợp lệ
+        var validAmounts: [Double] = []
+        for (index, line) in lines.enumerated() {
+            let norm = normalizedLines[index]
+            if isMetadataLine(norm) {
+                continue
+            }
+            if let amount = extractValidCurrency(from: line) {
+                validAmounts.append(amount)
+            }
+        }
+        
+        return validAmounts.last ?? 0
     }
     
-    private static func extractNumber(from text: String) -> Double? {
-        // Matches numerical sequences with comma/period thousands or decimal separators
-        let pattern = #"(\d{1,3}(?:[\.,]\d{3})+(?:[\.,]\d+)?|\d+(?:[\.,]\d+)?)"#
+    private static func isMetadataLine(_ normLine: String) -> Bool {
+        let blacklist = [
+            "thu ngan", "ma ptt", "ma cqt", "ma xac thuc", "so tham chieu",
+            "tham chieu", "dien thoai", "tel", "ext", "gio", "time",
+            "date", "diem", "point", "wifi", "password", "mst",
+            "sale type", "invoice", "hang the", "diamond"
+        ]
+        return blacklist.contains(where: { normLine.contains($0) })
+    }
+    
+    // MARK: - Validate Currency
+    private static func extractValidCurrency(from text: String) -> Double? {
+        let pattern = #"(\d{1,3}(?:[\.,]\d{3})+(?:[\.,]\d+)?|\d+)"#
         guard let regex = try? NSRegularExpression(pattern: pattern) else { return nil }
         
         let nsString = text as NSString
@@ -88,7 +107,7 @@ struct ReceiptOCRParser {
         for match in matches.reversed() {
             var numberString = nsString.substring(with: match.range)
             
-            // Normalize thousands formatting: "45.000" or "45,000"
+            // Xóa dấu phân tách hàng nghìn
             let dotParts = numberString.components(separatedBy: ".")
             let commaParts = numberString.components(separatedBy: ",")
             
@@ -100,31 +119,73 @@ struct ReceiptOCRParser {
                 numberString = numberString.replacingOccurrences(of: ",", with: ".")
             }
             
-            if let val = Double(numberString), val > 0 {
+            // Lọc chặt chẽ:
+            // - Đếm số lượng chữ số thuần túy: mã tham chiếu/PTT thường >= 10 số (ví dụ: 206902261005864 có 15 số)
+            // - Số tiền thông thường từ 1.000 đến dưới 200 triệu đồng
+            let digitsOnly = numberString.filter { $0.isNumber }
+            if digitsOnly.count >= 10 {
+                continue
+            }
+            
+            if let val = Double(numberString), val >= 1_000 && val <= 200_000_000 {
                 return val
             }
         }
         return nil
     }
     
-    // MARK: - Title / Merchant Extraction
+    // MARK: - Merchant Title Extraction
     private static func extractMerchantTitle(from lines: [String]) -> String {
-        let ignorePrefixes = [
-            "hóa đơn", "hoa don", "phiếu thanh toán", "phieu thanh toan",
-            "receipt", "invoice", "bill", "phiếu thu", "chuyển khoản",
-            "kính chào", "cảm ơn", "thank you", "welcome", "ngày", "date"
+        let knownBrands = [
+            "phuclong", "phuc long", "highlands", "starbucks",
+            "winmart", "circle k", "ministop", "7-eleven", "gs25"
         ]
         
-        // Merchant is usually within the first 4 valid lines
-        for line in lines.prefix(4) {
-            let lower = line.lowercased()
-            let shouldIgnore = ignorePrefixes.contains { lower.contains($0) }
+        let ignorePrefixes = [
+            "hoa don", "phieu thanh toan", "receipt", "invoice",
+            "bill", "phieu thu", "chuyen khoan", "kinh chao", "cam on"
+        ]
+        
+        let addressIndicators = [
+            "duong", "phuong", "quan", "tp.", "tp ", "thanh pho",
+            "ho chi minh", "ha noi", "hcm", "hn", "dien thoai", "tel", "ext", "siuce"
+        ]
+        
+        let searchWindow = lines.prefix(6)
+        
+        // 1. Quét tìm thương hiệu lớn trước
+        for line in searchWindow {
+            let norm = removeAccents(from: line.lowercased())
+            if let brand = knownBrands.first(where: { norm.contains($0) }) {
+                return brand == "phuclong" ? "Phúc Long" : brand.capitalized
+            }
+        }
+        
+        // 2. Nếu không thuộc brand có sẵn, loại trừ địa chỉ và lấy dòng tên cửa hàng đầu tiên
+        for line in searchWindow {
+            let norm = removeAccents(from: line.lowercased())
             
-            // Filter out phone numbers or pure numbers
-            let digitsOnly = line.replacingOccurrences(of: "[^0-9]", with: "", options: .regularExpression)
-            let isMostlyNumbers = Double(digitsOnly.count) / Double(max(1, line.count)) > 0.5
+            if ignorePrefixes.contains(where: { norm.contains($0) }) {
+                continue
+            }
             
-            if !shouldIgnore && !isMostlyNumbers && line.count > 2 {
+            // Bỏ qua dòng chứa từ định danh địa chỉ
+            if addressIndicators.contains(where: { norm.contains($0) }) {
+                continue
+            }
+            
+            // Bỏ qua nếu bắt đầu bằng số nhà (vd: "493A", "12/3")
+            if let firstWord = line.components(separatedBy: " ").first,
+               firstWord.rangeOfCharacter(from: .decimalDigits) != nil {
+                continue
+            }
+            
+            let digitsCount = line.filter { $0.isNumber }.count
+            if Double(digitsCount) / Double(max(1, line.count)) > 0.3 {
+                continue
+            }
+            
+            if line.count >= 2 {
                 return line.prefix(1).uppercased() + line.dropFirst()
             }
         }
@@ -135,21 +196,22 @@ struct ReceiptOCRParser {
     // MARK: - Category Detection
     private static func detectCategory(from lines: [String], title: String) -> TransactionCategory {
         let fullContent = (lines.joined(separator: " ") + " " + title).lowercased()
+        let normContent = removeAccents(from: fullContent)
         
         let categoryMapping: [(keywords: [String], category: TransactionCategory)] = [
-            (["highlands", "phúc long", "phuc long", "starbucks", "coffee", "cà phê", "cafe", "trà sữa", "bún", "phở", "cơm", "restaurant", "quán ăn", "nhà hàng", "pizza", "kfc", "lotteria", "food", "bbq"], .food),
-            (["winmart", "co.opmart", "bach hoa xanh", "bách hóa xanh", "circle k", "ministop", "7-eleven", "gs25", "siêu thị", "mart", "shopping", "shopee", "lazada", "tiki", "zara", "uniqlo"], .shopping),
-            (["xăng", "petrolimex", "pvoil", "grab", "be", "taxi", "gửi xe", "parking", "transport"], .transport),
-            (["cgv", "lotte cinema", "bhd", "cinema", "rạp phim", "karaoke", "billiards", "game"], .entertainment),
-            (["pharmacy", "nhà thuốc", "long châu", "an khang", "bệnh viện", "phòng khám", "medical", "hospital"], .health),
-            (["tiền điện", "tiền nước", "evn", "internet", "viettel", "fpt", "vnpt", "bill"], .bills),
-            (["fahasa", "phương nam", "nhà sách", "sách", "book", "course"], .education),
-            (["spa", "salon", "barber", "cắt tóc", "nail", "skincare"], .personalCare),
-            (["gym", "fitness", "yoga", "cầu lông", "pickleball", "tiền sân"], .sports)
+            (["highlands", "phuc long", "starbucks", "coffee", "ca phe", "cafe", "tra sua", "bun", "pho", "com", "restaurant", "quan an", "nha hang", "pizza", "kfc", "lotteria", "food", "bbq", "hong tra", "chanh"], .food),
+            (["winmart", "co.opmart", "bach hoa xanh", "circle k", "ministop", "7-eleven", "gs25", "sieu thi", "mart", "shopping", "shopee", "lazada", "tiki", "zara", "uniqlo"], .shopping),
+            (["xang", "petrolimex", "pvoil", "grab", "be", "taxi", "gui xe", "parking", "transport"], .transport),
+            (["cgv", "lotte cinema", "bhd", "cinema", "rap phim", "karaoke", "billiards", "game"], .entertainment),
+            (["pharmacy", "nha thuoc", "long chau", "an khang", "benh vien", "phong kham", "medical", "hospital"], .health),
+            (["tien dien", "tien nuoc", "evn", "internet", "viettel", "fpt", "vnpt", "bill"], .bills),
+            (["fahasa", "phuong nam", "nha sach", "sach", "book", "course"], .education),
+            (["spa", "salon", "barber", "cat toc", "nail", "skincare"], .personalCare),
+            (["gym", "fitness", "yoga", "cau long", "pickleball", "tien san"], .sports)
         ]
         
         for mapping in categoryMapping {
-            if mapping.keywords.contains(where: { fullContent.contains($0) }) {
+            if mapping.keywords.contains(where: { normContent.contains($0) }) {
                 return mapping.category
             }
         }
@@ -183,5 +245,13 @@ struct ReceiptOCRParser {
             }
         }
         return nil
+    }
+    
+    // MARK: - Helper Remove Accents
+    private static func removeAccents(from string: String) -> String {
+        return string
+            .folding(options: .diacriticInsensitive, locale: Locale(identifier: "vi_VN"))
+            .replacingOccurrences(of: "đ", with: "d")
+            .replacingOccurrences(of: "Đ", with: "D")
     }
 }

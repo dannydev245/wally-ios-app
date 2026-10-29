@@ -140,7 +140,7 @@ struct MainTabScreens: View {
                             category: confirmedResult.category
                         )
                     }
-                    .presentationDetents([.fraction(0.5)])
+                    .presentationDetents([.fraction(0.56)])
                     .presentationDragIndicator(.hidden)
                 }
             } else {

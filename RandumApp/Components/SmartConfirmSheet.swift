@@ -76,6 +76,25 @@ struct SmartConfirmSheet: View {
                     
                     Divider()
                     
+                    // 3. Ngày giao dịch (Khóa không cho chọn ngày tương lai)
+                    HStack {
+                        Text("Date")
+                            .font(.subheadline)
+                            .foregroundStyle(AppColors.textSecondary)
+                        Spacer()
+                        DatePicker(
+                            "",
+                            selection: $parsedResult.date,
+                            in: ...Date(), // Chặn ngày tương lai
+                            displayedComponents: [.date]
+                        )
+                        .datePickerStyle(.compact)
+                        .labelsHidden()
+                        .tint(themeManager.currentAccent.primaryColor)
+                    }
+                    
+                    Divider()
+                    
                     // Danh mục
                     HStack {
                         Text("Category")
@@ -95,7 +114,7 @@ struct SmartConfirmSheet: View {
                     RoundedRectangle(cornerRadius: 16)
                         .fill(themeManager.currentAccent.inputBackgroundColor)
                 )
-                                
+                
                 // Nút Xác nhận Lưu
                 Button {
                     UIImpactFeedbackGenerator(style: .medium).impactOccurred()

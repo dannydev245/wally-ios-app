@@ -17,14 +17,13 @@ struct ReceiptScannerSheet: View {
     
     @State private var isProcessing: Bool = false
     @State private var selectedPhotoItem: PhotosPickerItem? = nil
-    @State private var scanErrorMessage: String? = nil
     
     var body: some View {
         ZStack {
             // 1. Apple Document Camera Native View
             DocumentCameraView(
-                onScan: { scannedImage in
-                    processImage(scannedImage)
+                onScan: { scannedImages in
+                    processImages(scannedImages)
                 },
                 onCancel: {
                     dismiss()
@@ -47,7 +46,7 @@ struct ReceiptScannerSheet: View {
                             .background(.ultraThinMaterial)
                             .clipShape(Circle())
                     }
-                    .padding(.trailing, 20)
+                    .padding(.trailing, 25)
                     .padding(.bottom, 36)
                 }
             }
@@ -84,49 +83,54 @@ struct ReceiptScannerSheet: View {
                 if let data = try? await newItem.loadTransferable(type: Data.self),
                    let image = UIImage(data: data) {
                     await MainActor.run {
-                        processImage(image)
+                        processImages([image])
                     }
                 }
             }
         }
     }
     
-    // MARK: - Vision OCR Processing
-    private func processImage(_ image: UIImage) {
-        guard let cgImage = image.cgImage else { return }
+    // MARK: - Vision OCR Processing (Chạy tuần tự gộp text từ tối đa 3 trang)
+    private func processImages(_ images: [UIImage]) {
+        guard !images.isEmpty else { return }
         isProcessing = true
         
         DispatchQueue.global(qos: .userInitiated).async {
-            let request = VNRecognizeTextRequest { request, error in
-                guard error == nil,
-                      let observations = request.results as? [VNRecognizedTextObservation] else {
-                    DispatchQueue.main.async {
-                        self.isProcessing = false
+            var combinedLines: [String] = []
+            
+            for image in images {
+                guard let cgImage = image.cgImage else { continue }
+                
+                let semaphore = DispatchSemaphore(value: 0)
+                let request = VNRecognizeTextRequest { request, error in
+                    defer { semaphore.signal() }
+                    guard error == nil,
+                          let observations = request.results as? [VNRecognizedTextObservation] else {
+                        return
                     }
-                    return
+                    
+                    let lines = observations.compactMap { $0.topCandidates(1).first?.string }
+                    combinedLines.append(contentsOf: lines)
                 }
                 
-                // Extract lines sorted vertically
-                let recognizedLines = observations.compactMap { observation in
-                    observation.topCandidates(1).first?.string
-                }
+                request.recognitionLevel = .accurate
+                request.recognitionLanguages = ["vi-VN", "en-US"]
+                request.usesLanguageCorrection = true
                 
-                let parsedResult = ReceiptOCRParser.parse(recognizedLines: recognizedLines)
-                
-                DispatchQueue.main.async {
-                    self.isProcessing = false
-                    UINotificationFeedbackGenerator().notificationOccurred(.success)
-                    self.onScanCompleted(parsedResult)
-                }
+                let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+                try? handler.perform([request])
+                semaphore.wait()
             }
             
-            // Configure recognition for bilingual VN and EN accuracy
-            request.recognitionLevel = .accurate
-            request.recognitionLanguages = ["vi-VN", "en-US"]
-            request.usesLanguageCorrection = true
+            print("combinedLines", combinedLines)
             
-            let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
-            try? handler.perform([request])
+            let parsedResult = ReceiptOCRParser.parse(recognizedLines: combinedLines)
+            
+            DispatchQueue.main.async {
+                self.isProcessing = false
+                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                self.onScanCompleted(parsedResult)
+            }
         }
     }
 }
