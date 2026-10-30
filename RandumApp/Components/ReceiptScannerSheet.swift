@@ -90,16 +90,17 @@ struct ReceiptScannerSheet: View {
         }
     }
     
-    // MARK: - Vision OCR Processing (Chạy tuần tự gộp text từ tối đa 3 trang)
+    // MARK: - Vision OCR Processing (2D Spatial Extraction)
     private func processImages(_ images: [UIImage]) {
         guard !images.isEmpty else { return }
         isProcessing = true
         
         DispatchQueue.global(qos: .userInitiated).async {
-            var combinedLines: [String] = []
+            var allElements: [OCRTextElement] = []
             
-            for image in images {
-                guard let cgImage = image.cgImage else { continue }
+            for (pageIndex, image) in images.enumerated() {
+                let normalizedImg = image.fixedOrientation()
+                guard let cgImage = normalizedImg.cgImage else { continue }
                 
                 let semaphore = DispatchSemaphore(value: 0)
                 let request = VNRecognizeTextRequest { request, error in
@@ -109,8 +110,16 @@ struct ReceiptScannerSheet: View {
                         return
                     }
                     
-                    let lines = observations.compactMap { $0.topCandidates(1).first?.string }
-                    combinedLines.append(contentsOf: lines)
+                    for obs in observations {
+                        if let candidate = obs.topCandidates(1).first {
+                            var adjustedBox = obs.boundingBox
+                            adjustedBox.origin.y -= CGFloat(pageIndex)
+                             
+                            allElements.append(
+                                OCRTextElement(text: candidate.string, box: adjustedBox)
+                            )
+                        }
+                    }
                 }
                 
                 request.recognitionLevel = .accurate
@@ -122,9 +131,10 @@ struct ReceiptScannerSheet: View {
                 semaphore.wait()
             }
             
-            print("combinedLines", combinedLines)
+            print("allElements", allElements)
             
-            let parsedResult = ReceiptOCRParser.parse(recognizedLines: combinedLines)
+            // Processing using a spatial clustering algorithm to group 2D lines
+            let parsedResult = ReceiptOCRParser.parse(elements: allElements)
             
             DispatchQueue.main.async {
                 self.isProcessing = false

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 extension UserDefaults {
     var savedUser: User? {
@@ -44,5 +45,17 @@ extension Double {
     
     func toCompactCurrencyString() -> String {
         ThemeManager.shared.currentCurrency.formatCompact(amount: self)
+    }
+}
+
+extension UIImage {
+    /// Chuẩn hóa orientation của ảnh về .up để tọa độ Vision luôn nhất quán
+    func fixedOrientation() -> UIImage {
+        if imageOrientation == .up { return self }
+        UIGraphicsBeginImageContextWithOptions(size, false, scale)
+        draw(in: CGRect(origin: .zero, size: size))
+        let normalizedImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return normalizedImage ?? self
     }
 }
