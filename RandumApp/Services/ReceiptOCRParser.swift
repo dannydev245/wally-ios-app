@@ -13,13 +13,18 @@ enum ReceiptParseError: LocalizedError {
     case multipleTransactionsDetected
     case noDataDetected
     
-    var errorDescription: String? {
+    var localizedResource: LocalizedStringResource {
         switch self {
         case .multipleTransactionsDetected:
-            return String(localized: "The image contains multiple transactions. Please select a single transaction detail or invoice.")
+            return "The image contains multiple transactions. Please select a single transaction detail or invoice."
         case .noDataDetected:
-            return String(localized: "No valid payment information found on the image.")
+            return "No valid payment information found on the image."
         }
+    }
+    
+    // Thỏa mãn giao thức LocalizedError bằng cách resolve resource ra String
+    var errorDescription: String? {
+        String(localized: localizedResource)
     }
 }
 

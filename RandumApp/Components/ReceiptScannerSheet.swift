@@ -18,7 +18,7 @@ struct ReceiptScannerSheet: View {
     @State private var isProcessing: Bool = false
     @State private var selectedPhotoItem: PhotosPickerItem? = nil
     
-    @State private var errorMessage: String? = nil
+    @State private var errorMessageResource: LocalizedStringResource? = nil
     @State private var showErrorAlert: Bool = false
     
     var body: some View {
@@ -94,9 +94,9 @@ struct ReceiptScannerSheet: View {
         .alert("Unable to scan invoice", isPresented: $showErrorAlert) {
             Button("Understood", role: .cancel) { }
         } message: {
-            if let errorMessage = errorMessage {
-                Text(errorMessage)
-            } else {
+            if let resource = errorMessageResource {
+                Text(resource)
+            }else {
                 Text("Please try again with a clearer image of the receipt.")
             }
         }
@@ -144,7 +144,7 @@ struct ReceiptScannerSheet: View {
                 semaphore.wait()
             }
             
-//            print("allElements", allElements)
+            //            print("allElements", allElements)
             
             do {
                 let parsedResult = try ReceiptOCRParser.parse(elements: allElements)
@@ -155,10 +155,13 @@ struct ReceiptScannerSheet: View {
                     self.onScanCompleted(parsedResult)
                 }
             } catch {
+                let resource: LocalizedStringResource = (error as? ReceiptParseError)?.localizedResource
+                ?? "Please try again with a clearer image of the receipt."
+                
                 DispatchQueue.main.async {
                     self.isProcessing = false
                     UINotificationFeedbackGenerator().notificationOccurred(.error)
-                    self.errorMessage = error.localizedDescription
+                    self.errorMessageResource = resource
                     self.showErrorAlert = true
                 }
             }
