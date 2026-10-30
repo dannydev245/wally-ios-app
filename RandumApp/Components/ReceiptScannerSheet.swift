@@ -18,6 +18,9 @@ struct ReceiptScannerSheet: View {
     @State private var isProcessing: Bool = false
     @State private var selectedPhotoItem: PhotosPickerItem? = nil
     
+    @State private var errorMessage: String? = nil
+    @State private var showErrorAlert: Bool = false
+    
     var body: some View {
         ZStack {
             // 1. Apple Document Camera Native View
@@ -88,11 +91,21 @@ struct ReceiptScannerSheet: View {
                 }
             }
         }
+        .alert("Unable to scan invoice", isPresented: $showErrorAlert) {
+            Button("Understood", role: .cancel) { }
+        } message: {
+            if let errorMessage = errorMessage {
+                Text(errorMessage)
+            } else {
+                Text("Please try again with a clearer image of the receipt.")
+            }
+        }
     }
     
     // MARK: - Vision OCR Processing (2D Spatial Extraction)
     private func processImages(_ images: [UIImage]) {
         guard !images.isEmpty else { return }
+        
         isProcessing = true
         
         DispatchQueue.global(qos: .userInitiated).async {
@@ -114,7 +127,7 @@ struct ReceiptScannerSheet: View {
                         if let candidate = obs.topCandidates(1).first {
                             var adjustedBox = obs.boundingBox
                             adjustedBox.origin.y -= CGFloat(pageIndex)
-                             
+                            
                             allElements.append(
                                 OCRTextElement(text: candidate.string, box: adjustedBox)
                             )
@@ -131,15 +144,23 @@ struct ReceiptScannerSheet: View {
                 semaphore.wait()
             }
             
-            print("allElements", allElements)
+//            print("allElements", allElements)
             
-            // Processing using a spatial clustering algorithm to group 2D lines
-            let parsedResult = ReceiptOCRParser.parse(elements: allElements)
-            
-            DispatchQueue.main.async {
-                self.isProcessing = false
-                UINotificationFeedbackGenerator().notificationOccurred(.success)
-                self.onScanCompleted(parsedResult)
+            do {
+                let parsedResult = try ReceiptOCRParser.parse(elements: allElements)
+                
+                DispatchQueue.main.async {
+                    self.isProcessing = false
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                    self.onScanCompleted(parsedResult)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.isProcessing = false
+                    UINotificationFeedbackGenerator().notificationOccurred(.error)
+                    self.errorMessage = error.localizedDescription
+                    self.showErrorAlert = true
+                }
             }
         }
     }
