@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct AuthStackScreens: View {
+    @EnvironmentObject private var themeManager: ThemeManager
+    
     var onUserAuthenticated: (User) -> Void
 
     @State private var authPath: [AuthRoute] = []
@@ -51,6 +53,6 @@ struct AuthStackScreens: View {
                 }
             }
         }
-        .tint(AppColors.primary)
+        .tint(themeManager.currentAccent.primaryColor)
     }
 }

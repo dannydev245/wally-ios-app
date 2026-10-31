@@ -9,7 +9,7 @@ import SwiftUI
 
 struct TransactionFormSheet: View {
     @Environment(\.dismiss) private var dismiss
-    @ObservedObject private var themeManager = ThemeManager.shared
+    @EnvironmentObject private var themeManager: ThemeManager
     
     var transactionToEdit: TransactionItem? = nil
     var onSave: (String, Double, Date, TransactionType, TransactionCategory) -> Void

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct TransactionsScreen: View {
     @ObservedObject var viewModel: TransactionsViewModel
-    @ObservedObject private var themeManager = ThemeManager.shared
+    @EnvironmentObject private var themeManager: ThemeManager
     
     var body: some View {
         NavigationStack {
@@ -170,10 +170,9 @@ struct TransactionsScreen: View {
                     .scrollContentBackground(.hidden)
                     .environment(\.defaultMinListHeaderHeight, 0)
                 }
+                .padding(.top)
             }
-            .navigationTitle("Transactions")
-            .navigationBarTitleDisplayMode(.inline)
-            
+            .navigationBarHidden(true)
             // MARK: - Sheet Create / Edit
             .sheet(isPresented: $viewModel.showFormSheet) {
                 TransactionFormSheet(transactionToEdit: viewModel.editingTransaction) { title, amount, date, type, category in

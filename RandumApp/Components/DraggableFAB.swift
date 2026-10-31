@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct DraggableFAB: View {
-    @ObservedObject private var themeManager = ThemeManager.shared
+    @EnvironmentObject private var themeManager: ThemeManager
     
     var onSelectMode: (TransactionCreationMode) -> Void
     

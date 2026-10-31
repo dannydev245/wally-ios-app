@@ -9,7 +9,7 @@ import SwiftUI
 
 struct GetUserInfoScreen: View {
     var onComplete: (User) -> Void
-    @ObservedObject private var themeManager = ThemeManager.shared
+    @EnvironmentObject private var themeManager: ThemeManager
     
     @State private var name: String = ""
     @State private var age: String = ""

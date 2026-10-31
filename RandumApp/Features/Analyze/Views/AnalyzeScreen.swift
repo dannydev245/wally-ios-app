@@ -9,7 +9,7 @@ import SwiftUI
 import Charts
 
 struct AnalyzeScreen: View {
-    @ObservedObject private var themeManager = ThemeManager.shared
+    @EnvironmentObject private var themeManager: ThemeManager
     
     @ObservedObject var transactionsViewModel: TransactionsViewModel
     @StateObject private var viewModel = AnalyzeViewModel()
@@ -298,11 +298,11 @@ struct AnalyzeScreen: View {
                         
                         Spacer()
                     }
+                    .padding(.top)
                     .padding(.horizontal, 16)
                 }
             }
-            .navigationTitle("Analytics")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarHidden(true)
             .onAppear {
                 viewModel.updateAnalytics(from: transactionsViewModel.transactions)
             }

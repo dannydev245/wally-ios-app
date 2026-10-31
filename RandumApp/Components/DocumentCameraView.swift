@@ -12,7 +12,6 @@ struct DocumentCameraView: UIViewControllerRepresentable {
     var onScan: ([UIImage]) -> Void
     var onCancel: () -> Void
     
-    // Giới hạn an toàn: Tối đa 3 trang để bảo vệ RAM & CPU
     private let maxScanPages = 3
     
     func makeUIViewController(context: Context) -> VNDocumentCameraViewController {
@@ -44,7 +43,6 @@ struct DocumentCameraView: UIViewControllerRepresentable {
                 return
             }
             
-            // Chỉ lấy tối đa 3 trang đầu tiên
             let processCount = min(scan.pageCount, maxPages)
             var scannedImages: [UIImage] = []
             

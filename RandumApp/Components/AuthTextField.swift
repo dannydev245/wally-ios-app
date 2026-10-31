@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AuthTextField: View {
-    @ObservedObject private var themeManager = ThemeManager.shared
+    @EnvironmentObject private var themeManager: ThemeManager
     
     let title: String
     @Binding var text: String

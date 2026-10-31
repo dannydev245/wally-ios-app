@@ -12,14 +12,12 @@ struct ProfileScreen: View {
     var onLogout: () -> Void
     
     @EnvironmentObject private var userManager: UserManager
-    @ObservedObject private var themeManager = ThemeManager.shared
+    @EnvironmentObject private var themeManager: ThemeManager
     
     // Sheets & Alerts
     @State private var showEditProfileSheet = false
     @State private var showClearDataAlert = false
     @State private var showLogoutConfirmation = false
-    @State private var shareURL: URL? = nil
-    @State private var showShareSheet = false
     
     @State private var confirmClearText = ""
     @State private var confirmLogoutText: String = ""
@@ -41,12 +39,11 @@ struct ProfileScreen: View {
                         dataPreferencesCard
                         dangerZoneCard
                     }
+                    .padding(.top)
                     .padding(.horizontal, 16)
                 }
             }
-            .navigationTitle("Profile")
-            .navigationBarTitleDisplayMode(.inline)
-            
+            .navigationBarHidden(true)
             // MARK: - Sheet: EditProfileSheet
             .sheet(isPresented: $showEditProfileSheet) {
                 EditProfileSheet(user: currentUser) { updatedUser in
@@ -100,15 +97,9 @@ struct ProfileScreen: View {
             } message: {
                 Text("This action is permanent and will wipe all recorded transactions and remove your user session. Please type LOGOUT to proceed.")
             }
-            
-            // MARK: - Sheet: Chia sẻ CSV (Dùng ActivityView từ Utils/UIHelpers)
-            .sheet(isPresented: $showShareSheet) {
-                if let url = shareURL {
-                    ActivityView(activityItems: [url])
-                }
-            }
         }
         .tint(themeManager.currentAccent.primaryColor)
+        //        .id(themeManager.currentLanguage.locale.identifier)
     }
     
     // Card 1: User Header

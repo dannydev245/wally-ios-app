@@ -9,7 +9,7 @@ import SwiftUI
 
 struct VoiceRecordingSheet: View {
     @Environment(\.dismiss) private var dismiss
-    @ObservedObject private var themeManager = ThemeManager.shared
+    @EnvironmentObject private var themeManager: ThemeManager
     @StateObject private var speechRecognizer = SpeechRecognizer()
     
     var onParsedSuccessfully: (ParsedTransactionResult) -> Void

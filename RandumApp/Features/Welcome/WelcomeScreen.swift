@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct WelcomeScreen: View {
-    @ObservedObject private var themeManager = ThemeManager.shared
+    @EnvironmentObject private var themeManager: ThemeManager
     
     let onGetStarted: () -> Void
     

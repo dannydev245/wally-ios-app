@@ -10,7 +10,7 @@ import SwiftUI
 struct MainTabScreens: View {
     var onLogout: () -> Void
     
-    @ObservedObject private var themeManager = ThemeManager.shared
+    @EnvironmentObject private var themeManager: ThemeManager
     
     @State private var selectedTab: MainAppTab = .home
     @State private var showCreateSheet: Bool = false
@@ -70,11 +70,11 @@ struct MainTabScreens: View {
                         .tag(MainAppTab.profile)
                     }
                     .tint(themeManager.currentAccent.primaryColor)
-                    .onChange(of: themeManager.selectedAccentRaw) { _, _ in
-                        UIView.animate(withDuration: 0.25) {
-                            UITabBar.appearance().tintColor = UIColor(themeManager.currentAccent.primaryColor)
-                        }
-                    }
+//                    .onChange(of: themeManager.selectedAccentRaw) { _, _ in
+//                        UIView.animate(withDuration: 0.25) {
+//                            UITabBar.appearance().tintColor = UIColor(themeManager.currentAccent.primaryColor)
+//                        }
+//                    }
                     
                     
                     let shouldShowFAB = selectedTab == .home || selectedTab == .transactions
@@ -152,5 +152,6 @@ struct MainTabScreens: View {
 
 #Preview {
     MainTabScreens(onLogout: {print("1")})
-        .environmentObject(UserManager())
+        .environmentObject(UserManager.shared)
+        .environmentObject(ThemeManager.shared)
 }

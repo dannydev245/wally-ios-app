@@ -9,7 +9,7 @@ import SwiftUI
 struct EditProfileSheet: View {
     @Environment(\.dismiss) private var dismiss
     
-    @ObservedObject private var themeManager = ThemeManager.shared
+    @EnvironmentObject private var themeManager: ThemeManager
     
     @State private var name: String
     @State private var age: String

@@ -10,7 +10,7 @@ import Charts
 
 struct HomeScreen: View {
     @EnvironmentObject private var userManager: UserManager
-    @ObservedObject private var themeManager = ThemeManager.shared
+    @EnvironmentObject private var themeManager: ThemeManager
 
     @StateObject private var viewModel = HomeViewModel()
     @ObservedObject var transactionsViewModel: TransactionsViewModel
@@ -51,15 +51,9 @@ struct HomeScreen: View {
                             
                             Spacer()
                             
-                            ZStack {
-                                Circle()
-                                    .fill(themeManager.currentAccent.primaryColor.opacity(0.15))
-                                    .frame(width: 50, height: 50)
-                                
-                                Image(systemName: "person.crop.circle.fill")
-                                    .font(.system(size: 30, weight: .semibold))
-                                    .foregroundStyle(AppColors.primary)
-                            }
+                            Image(systemName: "person.crop.circle.fill")
+                                .font(.system(size: 40, weight: .semibold))
+                                .foregroundStyle(themeManager.currentAccent.primaryColor)
                         }
                         .padding(.top, 10)
                         
@@ -80,7 +74,7 @@ struct HomeScreen: View {
                                 HStack(spacing: 8) {
                                     Image(systemName: "arrow.down.left.circle.fill")
                                         .font(.system(size: 30))
-                                        .foregroundStyle(AppColors.greenEmerald)
+                                        .foregroundStyle(.white)
                                     
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text("Income")
@@ -100,8 +94,8 @@ struct HomeScreen: View {
                                 // MARK: - 2. EXPENSE COLUMN
                                 HStack(spacing: 8) {
                                     Image(systemName: "arrow.up.right.circle.fill")
-                                        .font(.system(size: 26))
-                                        .foregroundStyle(AppColors.redBright)
+                                        .font(.system(size: 30))
+                                        .foregroundStyle(.white)
                                     
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text("Expense")

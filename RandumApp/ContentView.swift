@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject private var userManager: UserManager
+    @EnvironmentObject private var themeManager: ThemeManager
     
     var body: some View {
         Group {
@@ -15,11 +16,12 @@ struct ContentView: View {
                 }
             }
         }
-        .tint(AppColors.primary)
+        .tint(themeManager.currentAccent.primaryColor)
     }
 }
 
 #Preview {
     ContentView()
-        .environmentObject(UserManager())
+        .environmentObject(UserManager.shared)
+        .environmentObject(ThemeManager.shared)
 }

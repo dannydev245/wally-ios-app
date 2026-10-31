@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct TransactionRowView: View {
+    @EnvironmentObject private var themeManager: ThemeManager
+    
     let transaction: TransactionItem
-    @ObservedObject private var themeManager = ThemeManager.shared
     
     var body: some View {
         HStack(spacing: 14) {

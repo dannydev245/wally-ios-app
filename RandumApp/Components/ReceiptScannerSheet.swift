@@ -11,7 +11,7 @@ import PhotosUI
 
 struct ReceiptScannerSheet: View {
     @Environment(\.dismiss) private var dismiss
-    @ObservedObject private var themeManager = ThemeManager.shared
+    @EnvironmentObject private var themeManager: ThemeManager
     
     var onScanCompleted: (ParsedTransactionResult) -> Void
     

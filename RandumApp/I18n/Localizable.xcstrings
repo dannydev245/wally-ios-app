@@ -173,6 +173,7 @@
       }
     },
     "Analytics" : {
+      "extractionState" : "stale",
       "localizations" : {
         "vi" : {
           "stringUnit" : {
