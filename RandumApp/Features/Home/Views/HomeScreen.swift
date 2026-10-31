@@ -35,204 +35,13 @@ struct HomeScreen: View {
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 20) {
                         // MARK: - Header (Greetings)
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Welcome back,")
-                                    .font(.system(size: 16, weight: .medium))
-                                    .foregroundStyle(AppColors.textSecondary)
-                                
-                                Text(userManager.currentUser?.name ?? "user")
-                                    .font(.system(size: 24, weight: .bold))
-                                    .foregroundStyle(AppColors.textPrimary)
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.65)
-                                    .allowsTightening(true)
-                            }
-                            
-                            Spacer()
-                            
-                            Image(systemName: "person.crop.circle.fill")
-                                .font(.system(size: 40, weight: .semibold))
-                                .foregroundStyle(themeManager.currentAccent.primaryColor)
-                        }
-                        .padding(.top, 10)
-                        
+                        headerSection
                         // MARK: - Card Balance Overview
-                        VStack(alignment: .leading, spacing: 18) {
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text("Total Balance")
-                                    .font(.system(size: 18, weight: .bold))
-                                    .foregroundStyle(.white.opacity(0.85))
-                                
-                                Text(viewModel.totalBalance.toCurrencyString())
-                                    .font(.system(size: 28, weight: .bold))
-                                    .foregroundStyle(.white)
-                            }
-                            
-                            HStack(alignment: .center, spacing: 12) {
-                                // MARK: - 1. INCOME COLUMN
-                                HStack(spacing: 8) {
-                                    Image(systemName: "arrow.down.left.circle.fill")
-                                        .font(.system(size: 30))
-                                        .foregroundStyle(.white)
-                                    
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text("Income")
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundStyle(Color.white.opacity(0.85))
-                                        
-                                        Text(viewModel.monthlyIncome.toCurrencyString())
-                                            .font(.system(size: 15, weight: .bold))
-                                            .foregroundStyle(.white)
-                                            .lineLimit(1)
-                                            .minimumScaleFactor(0.65)
-                                            .allowsTightening(true)
-                                    }
-                                }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                
-                                // MARK: - 2. EXPENSE COLUMN
-                                HStack(spacing: 8) {
-                                    Image(systemName: "arrow.up.right.circle.fill")
-                                        .font(.system(size: 30))
-                                        .foregroundStyle(.white)
-                                    
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text("Expense")
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundStyle(Color.white.opacity(0.85))
-                                        
-                                        Text(viewModel.monthlyExpense.toCurrencyString())
-                                            .font(.system(size: 15, weight: .bold))
-                                            .foregroundStyle(.white)
-                                            .lineLimit(1)
-                                            .minimumScaleFactor(0.65)
-                                            .allowsTightening(true)
-                                    }
-                                }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                        }
-                        .padding(16)
-                        .background(
-                            LinearGradient(
-                                colors: [themeManager.currentAccent.primaryColor, themeManager.currentAccent.primaryColor.opacity(0.85)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: 24))
-                        .shadow(color: themeManager.currentAccent.primaryColor.opacity(0.25), radius: 12, y: 6)
-                        
+                        balanceOverviewCard
                         // MARK: - Month Spending & Income Overview
-                        VStack(alignment: .leading, spacing: 18) {
-                            // Legend note for chart
-                            HStack {
-                                Text("Monthly Overview")
-                                    .font(.system(size: 18, weight: .bold))
-                                    .foregroundStyle(AppColors.textPrimary)
-                                
-                                Spacer()
-                                HStack(spacing: 12) {
-                                    HStack(spacing: 4) {
-                                        Circle()
-                                            .fill(AppColors.greenEmerald)
-                                            .frame(width: 8, height: 8)
-                                        Text("Income")
-                                            .font(.system(size: 11, weight: .medium))
-                                            .foregroundStyle(AppColors.textSecondary)
-                                    }
-                                    
-                                    HStack(spacing: 4) {
-                                        Circle()
-                                            .fill(AppColors.redBright)
-                                            .frame(width: 8, height: 8)
-                                        Text("Expense")
-                                            .font(.system(size: 11, weight: .medium))
-                                            .foregroundStyle(AppColors.textSecondary)
-                                    }                                    
-                                }
-                            }
-                                                        
-                            if viewModel.chartData.allSatisfy({ $0.amount == 0 }) {
-                                Text("No transaction data for this month yet.")
-                                    .font(.system(size: 13))
-                                    .foregroundStyle(AppColors.textSecondary)
-                                    .frame(maxWidth: .infinity, minHeight: 140)
-                            } else {
-                                Chart(viewModel.chartData) { item in
-                                    BarMark(
-                                        x: .value("Week", item.weekLabel),
-                                        y: .value("Amount", item.amount)
-                                    )
-                                    .position(by: .value("Type", item.type.rawValue))
-                                    .foregroundStyle(
-                                        item.type == .income
-                                        ? AppColors.greenEmerald
-                                        : AppColors.redBright
-                                    )
-                                    .cornerRadius(4)
-                                }
-                                .id(themeManager.currentCurrency)
-                                .frame(height: 150)
-                                .chartYAxis {
-                                    AxisMarks(position: .leading) { value in
-                                        AxisGridLine()
-                                        AxisValueLabel {
-                                            if let amount = value.as(Double.self) {
-                                                Text(amount.toCompactCurrencyString())
-                                                    .font(.system(size: 9))
-                                            }
-                                        }
-                                    }
-                                }
-                                .chartXAxis {
-                                    AxisMarks(position: .bottom) { _ in
-                                        AxisValueLabel()
-                                            .font(.system(size: 9, weight: .medium))
-                                    }
-                                }
-                            }
-                        }
-                        .padding(16)
-                        .background(themeManager.currentAccent.inputBackgroundColor)
-                        .clipShape(RoundedRectangle(cornerRadius: 24))
-                        
+                        monthlyOverviewCard
                         // MARK: - Recent Transactions
-                        VStack(spacing: 18) {
-                            HStack {
-                                Text("Recent Transactions")
-                                    .font(.system(size: 18, weight: .bold))
-                                    .foregroundStyle(AppColors.textPrimary)
-                                
-                                Spacer()
-                                
-                                Button {
-                                    onSeeAllTapped()
-                                } label: {
-                                    Text("See All")
-                                        .font(.system(size: 14, weight: .semibold))
-                                        .foregroundStyle(AppColors.primary)
-                                }
-                            }
-                            
-                            if viewModel.recentTransactions.isEmpty {
-                                Text("No recent transactions")
-                                    .font(.system(size: 14))
-                                    .foregroundStyle(AppColors.textSecondary)
-                                    .padding(.top, 16)
-                            } else {
-                                VStack(spacing: 10) {
-                                    ForEach(viewModel.recentTransactions) { tx in
-                                        TransactionRowView(transaction: tx)
-                                            .padding(.trailing, 12)
-                                            .padding(.vertical, 6)
-                                            .background(themeManager.currentAccent.inputBackgroundColor)
-                                            .clipShape(RoundedRectangle(cornerRadius: 24))
-                                    }
-                                }
-                            }
-                        }
+                        recentTransactionsSection
                         
                         Spacer()
                     }
@@ -248,6 +57,210 @@ struct HomeScreen: View {
             }
         }
         .tint(themeManager.currentAccent.primaryColor)
+    }
+    
+    private var headerSection: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Welcome back,")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(AppColors.textSecondary)
+                
+                Text(userManager.currentUser?.name ?? "user")
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundStyle(AppColors.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.65)
+                    .allowsTightening(true)
+            }
+            
+            Spacer()
+            
+            Image(systemName: "person.crop.circle.fill")
+                .font(.system(size: 40, weight: .semibold))
+                .foregroundStyle(themeManager.currentAccent.primaryColor)
+        }
+        .padding(.top, 10)
+    }
+    
+    private var balanceOverviewCard: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Total Balance")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.85))
+                
+                Text(viewModel.totalBalance.toCurrencyString())
+                    .font(.system(size: 28, weight: .bold))
+                    .foregroundStyle(.white)
+            }
+            
+            HStack(alignment: .center, spacing: 12) {
+                // MARK: - 1. INCOME COLUMN
+                HStack(spacing: 8) {
+                    Image(systemName: "arrow.down.left.circle.fill")
+                        .font(.system(size: 30))
+                        .foregroundStyle(.white)
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Income")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(Color.white.opacity(0.85))
+                        
+                        Text(viewModel.monthlyIncome.toCurrencyString())
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundStyle(.white)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.65)
+                            .allowsTightening(true)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                
+                // MARK: - 2. EXPENSE COLUMN
+                HStack(spacing: 8) {
+                    Image(systemName: "arrow.up.right.circle.fill")
+                        .font(.system(size: 30))
+                        .foregroundStyle(.white)
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Expense")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(Color.white.opacity(0.85))
+                        
+                        Text(viewModel.monthlyExpense.toCurrencyString())
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundStyle(.white)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.65)
+                            .allowsTightening(true)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .padding(16)
+        .background(
+            LinearGradient(
+                colors: [themeManager.currentAccent.primaryColor, themeManager.currentAccent.primaryColor.opacity(0.85)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 24))
+        .shadow(color: themeManager.currentAccent.primaryColor.opacity(0.25), radius: 12, y: 6)
+    }
+    
+    private var monthlyOverviewCard: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            // Legend note for chart
+            HStack {
+                Text("Monthly Overview")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(AppColors.textPrimary)
+                
+                Spacer()
+                HStack(spacing: 12) {
+                    HStack(spacing: 4) {
+                        Circle()
+                            .fill(AppColors.greenEmerald)
+                            .frame(width: 8, height: 8)
+                        Text("Income")
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(AppColors.textSecondary)
+                    }
+                    
+                    HStack(spacing: 4) {
+                        Circle()
+                            .fill(AppColors.redBright)
+                            .frame(width: 8, height: 8)
+                        Text("Expense")
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(AppColors.textSecondary)
+                    }
+                }
+            }
+            
+            if viewModel.chartData.allSatisfy({ $0.amount == 0 }) {
+                Text("No transaction data for this month yet.")
+                    .font(.system(size: 13))
+                    .foregroundStyle(AppColors.textSecondary)
+                    .frame(maxWidth: .infinity, minHeight: 140)
+            } else {
+                Chart(viewModel.chartData) { item in
+                    BarMark(
+                        x: .value("Week", item.weekLabel),
+                        y: .value("Amount", item.amount)
+                    )
+                    .position(by: .value("Type", item.type.rawValue))
+                    .foregroundStyle(
+                        item.type == .income
+                        ? AppColors.greenEmerald
+                        : AppColors.redBright
+                    )
+                    .cornerRadius(4)
+                }
+                .id(themeManager.currentCurrency)
+                .frame(height: 150)
+                .chartYAxis {
+                    AxisMarks(position: .leading) { value in
+                        AxisGridLine()
+                        AxisValueLabel {
+                            if let amount = value.as(Double.self) {
+                                Text(amount.toCompactCurrencyString())
+                                    .font(.system(size: 9))
+                            }
+                        }
+                    }
+                }
+                .chartXAxis {
+                    AxisMarks(position: .bottom) { _ in
+                        AxisValueLabel()
+                            .font(.system(size: 9, weight: .medium))
+                    }
+                }
+            }
+        }
+        .padding(16)
+        .background(themeManager.currentAccent.inputBackgroundColor)
+        .clipShape(RoundedRectangle(cornerRadius: 24))
+    }
+    
+    private var recentTransactionsSection: some View {
+        VStack(spacing: 18) {
+            HStack {
+                Text("Recent Transactions")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(AppColors.textPrimary)
+                
+                Spacer()
+                
+                Button {
+                    onSeeAllTapped()
+                } label: {
+                    Text("See All")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(AppColors.primary)
+                }
+            }
+            
+            if viewModel.recentTransactions.isEmpty {
+                Text("No recent transactions")
+                    .font(.system(size: 14))
+                    .foregroundStyle(AppColors.textSecondary)
+                    .padding(.top, 16)
+            } else {
+                VStack(spacing: 10) {
+                    ForEach(viewModel.recentTransactions) { tx in
+                        TransactionRowView(transaction: tx)
+                            .padding(.trailing, 12)
+                            .padding(.vertical, 6)
+                            .background(themeManager.currentAccent.inputBackgroundColor)
+                            .clipShape(RoundedRectangle(cornerRadius: 24))
+                    }
+                }
+            }
+        }
     }
 }
 

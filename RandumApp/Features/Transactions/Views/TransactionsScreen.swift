@@ -48,7 +48,6 @@ struct TransactionsScreen: View {
         .tint(themeManager.currentAccent.primaryColor)
     }
     
-    @ViewBuilder
     private var filterHeaderSection: some View {
         Section{
             VStack(spacing: 12) {
@@ -139,7 +138,6 @@ struct TransactionsScreen: View {
         .listSectionSeparator(.hidden)
     }
     
-    @ViewBuilder
     private var emptyStateSection: some View {
         VStack(alignment: .center,spacing: 12) {
             Spacer()

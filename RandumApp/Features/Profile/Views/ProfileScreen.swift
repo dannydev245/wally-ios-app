@@ -99,7 +99,6 @@ struct ProfileScreen: View {
             }
         }
         .tint(themeManager.currentAccent.primaryColor)
-        //        .id(themeManager.currentLanguage.locale.identifier)
     }
     
     // Card 1: User Header
@@ -303,5 +302,6 @@ struct ProfileScreen: View {
         transactionsViewModel: TransactionsViewModel(),
         onLogout: {print("1")}
     )
-    .environmentObject(UserManager())
+    .environmentObject(UserManager.shared)
+    .environmentObject(ThemeManager.shared)
 }
