@@ -11,8 +11,8 @@ struct SmartConfirmSheet: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var themeManager: ThemeManager
     
-    @State var parsedResult: ParsedTransactionResult
-    var onConfirm: (ParsedTransactionResult) -> Void
+    @State var parsedResult: TransactionItem
+    var onConfirm: (TransactionItem) -> Void
     
     var body: some View {
         NavigationStack {

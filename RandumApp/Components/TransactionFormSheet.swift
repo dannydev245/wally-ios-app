@@ -12,7 +12,7 @@ struct TransactionFormSheet: View {
     @EnvironmentObject private var themeManager: ThemeManager
     
     var transactionToEdit: TransactionItem? = nil
-    var onSave: (String, Double, Date, TransactionType, TransactionCategory) -> Void
+    var onSave: (TransactionItem) -> Void
     
     @State private var selectedType: TransactionType = .expense
     @State private var title: String = ""
@@ -23,7 +23,7 @@ struct TransactionFormSheet: View {
     
     init(
         transactionToEdit: TransactionItem? = nil,
-        onSave: @escaping (String, Double, Date, TransactionType, TransactionCategory) -> Void
+        onSave: @escaping (TransactionItem) -> Void
     ) {
         self.transactionToEdit = transactionToEdit
         self.onSave = onSave
@@ -207,7 +207,17 @@ struct TransactionFormSheet: View {
                         // MARK: - Action Button
                         Button {
                             guard let amount = Double(amountString), isFormValid else { return }
-                            onSave(title.trimmingCharacters(in: .whitespaces), amount, selectedDate, selectedType, selectedCategory)
+                            
+                            let itemToSave = TransactionItem(
+                                id: transactionToEdit?.id ?? UUID(),
+                                title: title.trimmingCharacters(in: .whitespaces),
+                                amount: amount,
+                                date: selectedDate,
+                                type: selectedType,
+                                category: selectedCategory
+                            )
+                            
+                            onSave(itemToSave)
                             dismiss()
                         } label: {
                             Text(transactionToEdit == nil ? "Create Transaction" : "Update Transaction")
@@ -242,7 +252,7 @@ struct TransactionFormSheet: View {
 }
 
 #Preview {
-    TransactionFormSheet(transactionToEdit: nil, onSave: {title, amount, date, type, category in
+    TransactionFormSheet(transactionToEdit: nil, onSave: {newTrx in
         print()
     })
 }

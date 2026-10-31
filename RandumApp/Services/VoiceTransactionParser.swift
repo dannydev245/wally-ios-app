@@ -8,7 +8,7 @@
 import Foundation
 
 struct VoiceTransactionParser {
-    static func parse(text: String) -> ParsedTransactionResult {
+    static func parse(text: String) -> TransactionItem {
         // 1. Initial normalization: lowercased, trimmed, and unified slang/pronunciation variations
         var normalizedText = text.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
         normalizedText = normalizedText
@@ -59,12 +59,12 @@ struct VoiceTransactionParser {
             title = title.prefix(1).uppercased() + title.dropFirst()
         }
         
-        return ParsedTransactionResult(
+        return TransactionItem(
             title: title,
             amount: extractedAmount,
+            date: Date(),
             type: transactionType,
-            category: category,
-            date: Date()
+            category: category
         )
     }
     

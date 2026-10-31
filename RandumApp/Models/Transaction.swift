@@ -140,26 +140,49 @@ enum TransactionCategory: String, CaseIterable, Codable, Identifiable {
     }
 }
 
-struct TransactionItem: Identifiable, Codable, Equatable {
-    var id: UUID = UUID()
-    var title: String
-    var amount: Double
-    var date: Date
-    var type: TransactionType
-    var category: TransactionCategory
-}
-
 struct TransactionGroup: Identifiable {
     let id = UUID()
     let date: Date
     let items: [TransactionItem]
 }
 
-struct ParsedTransactionResult: Identifiable {
-    var id = UUID()
+struct TransactionItem: Identifiable, Codable, Equatable {
+    var id: UUID = UUID()
     var title: String
     var amount: Double
+    var date: Date = Date()
     var type: TransactionType
     var category: TransactionCategory
-    var date: Date = Date()
+}
+
+enum TransactionFilterType: String, CaseIterable {
+    case all = "All"
+    case expense = "Expense"
+    case income = "Income"
+    
+    var id: String { rawValue }
+    
+    var localizedTitle: LocalizedStringResource {
+        switch self {
+        case .all: return "All"
+        case .expense: return "Expense"
+        case .income: return "Income"
+        }
+    }
+}
+
+enum DateRangeFilter: String, CaseIterable {
+    case all = "All Time"
+    case thisMonth = "This Month"
+    case last7Days = "Last 7 Days"
+    
+    var id: String { rawValue }
+    
+    var localizedTitle: LocalizedStringResource {
+        switch self {
+        case .all: return "All Time"
+        case .thisMonth: return "This Month"
+        case .last7Days: return "Last 7 Days"
+        }
+    }
 }

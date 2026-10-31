@@ -19,7 +19,7 @@ struct MainTabScreens: View {
     @EnvironmentObject private var userManager: UserManager
     
     @State private var activeCreationMode: TransactionCreationMode? = nil
-    @State private var smartConfirmResult: ParsedTransactionResult? = nil
+    @State private var smartConfirmResult: TransactionItem? = nil
     
     var body: some View {
         Group{
@@ -91,14 +91,8 @@ struct MainTabScreens: View {
                     get: { activeCreationMode == .manual },
                     set: { if !$0 { activeCreationMode = nil } }
                 )) {
-                    TransactionFormSheet(transactionToEdit: nil) { title, amount, date, type, category in
-                        transactionsViewModel.addTransaction(
-                            title: title,
-                            amount: amount,
-                            date: date,
-                            type: type,
-                            category: category
-                        )
+                    TransactionFormSheet(transactionToEdit: nil) { newTx in
+                        transactionsViewModel.addTransaction(newTx)
                     }
                     .presentationDetents([.fraction(0.68), .large])
                     .presentationDragIndicator(.visible)
@@ -131,14 +125,8 @@ struct MainTabScreens: View {
                 }
                 // Sheet Smart Confirm
                 .sheet(item: $smartConfirmResult) { result in
-                    SmartConfirmSheet(parsedResult: result) { confirmedResult in
-                        transactionsViewModel.addTransaction(
-                            title: confirmedResult.title,
-                            amount: confirmedResult.amount,
-                            date: confirmedResult.date,
-                            type: confirmedResult.type,
-                            category: confirmedResult.category
-                        )
+                    SmartConfirmSheet(parsedResult: result) { confirmedItem in
+                        transactionsViewModel.addTransaction(confirmedItem)
                     }
                     .presentationDetents([.fraction(0.6)])
                     .presentationDragIndicator(.hidden)

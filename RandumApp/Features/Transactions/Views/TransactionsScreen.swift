@@ -173,20 +173,10 @@ struct TransactionsScreen: View {
                 .padding(.top)
             }
             .navigationBarHidden(true)
-            // MARK: - Sheet Create / Edit
+            // MARK: - Sheet Edit
             .sheet(isPresented: $viewModel.showFormSheet) {
-                TransactionFormSheet(transactionToEdit: viewModel.editingTransaction) { title, amount, date, type, category in
-                    if let editing = viewModel.editingTransaction {
-                        let updated = TransactionItem(
-                            id: editing.id,
-                            title: title,
-                            amount: amount,
-                            date: date,
-                            type: type,
-                            category: category
-                        )
-                        viewModel.updateTransaction(updated)
-                    }
+                TransactionFormSheet(transactionToEdit: viewModel.editingTransaction) { updatedTrx in
+                    viewModel.updateTransaction(updatedTrx)
                 }
                 .presentationDetents([.fraction(0.68), .large])
                 .presentationDragIndicator(.visible)

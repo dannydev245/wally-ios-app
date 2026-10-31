@@ -10,7 +10,7 @@ import CoreGraphics
 
 struct ReceiptOCRParser {
     // MARK: - 1. PARSE
-    static func parse(elements: [OCRTextElement]) throws -> ParsedTransactionResult {
+    static func parse(elements: [OCRTextElement]) throws -> TransactionItem {
         guard !elements.isEmpty else {
             throw ReceiptParseError.noDataDetected
         }
@@ -42,7 +42,7 @@ struct ReceiptOCRParser {
         elements: [OCRTextElement],
         rows: [OCRTextRow],
         fullLines: [String]
-    ) -> ParsedTransactionResult {
+    ) -> TransactionItem {
         
         var transactionType: TransactionType = .expense
         var heroAmount: Double = 0
@@ -53,7 +53,7 @@ struct ReceiptOCRParser {
             if t.contains("+") { transactionType = .income }
             if t.contains("-") { transactionType = .expense }
             
-            // Tìm Hero Amount (chữ to nhất ở nửa trên topDownY < 0.40)
+            // Find the Hero Amount (the largest text in the upper half, where topDownY < 0.40)
             if elem.topDownY < 0.40, let val = OCRTextMatcher.extractCurrency(from: elem.text, allowMinus: true) {
                 if elem.textHeight > maxFontHeight {
                     maxFontHeight = elem.textHeight
@@ -66,12 +66,12 @@ struct ReceiptOCRParser {
         let date = OCRTextMatcher.extractDate(from: fullLines) ?? Date()
         let category = extractDigitalCategory(from: rows, fullLines: fullLines, title: title)
         
-        return ParsedTransactionResult(
+        return TransactionItem(
             title: title,
             amount: heroAmount,
+            date: date,
             type: transactionType,
-            category: category,
-            date: date
+            category: category
         )
     }
     
@@ -79,18 +79,18 @@ struct ReceiptOCRParser {
     private static func parsePhysicalReceipt(
         rows: [OCRTextRow],
         fullLines: [String]
-    ) -> ParsedTransactionResult {
+    ) -> TransactionItem {
         let category = OCRTextMatcher.detectCategory(from: fullLines, title: "")
         let title = extractReceiptTitle(from: rows, fullLines: fullLines, fallbackCategory: category)
         let amount = extractReceiptAmount(from: rows)
         let date = OCRTextMatcher.extractDate(from: fullLines) ?? Date()
         
-        return ParsedTransactionResult(
+        return TransactionItem(
             title: title,
             amount: amount,
+            date: date,
             type: .expense,
-            category: category,
-            date: date
+            category: category
         )
     }
     

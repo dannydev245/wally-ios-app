@@ -8,38 +8,6 @@
 import Foundation
 import Combine
 
-enum TransactionFilterType: String, CaseIterable {
-    case all = "All"
-    case expense = "Expense"
-    case income = "Income"
-    
-    var id: String { rawValue }
-    
-    var localizedTitle: LocalizedStringResource {
-        switch self {
-        case .all: return "All"
-        case .expense: return "Expense"
-        case .income: return "Income"
-        }
-    }
-}
-
-enum DateRangeFilter: String, CaseIterable {
-    case all = "All Time"
-    case thisMonth = "This Month"
-    case last7Days = "Last 7 Days"
-    
-    var id: String { rawValue }
-    
-    var localizedTitle: LocalizedStringResource {
-        switch self {
-        case .all: return "All Time"
-        case .thisMonth: return "This Month"
-        case .last7Days: return "Last 7 Days"
-        }
-    }
-}
-
 class TransactionsViewModel: ObservableObject {
     @Published var transactions: [TransactionItem] = []
     @Published var searchText: String = ""
@@ -63,14 +31,7 @@ class TransactionsViewModel: ObservableObject {
         UserDefaults.standard.savedTransactions = self.transactions
     }
     
-    func addTransaction(title: String, amount: Double, date: Date, type: TransactionType, category: TransactionCategory) {
-        let newTx = TransactionItem(
-            title: title,
-            amount: amount,
-            date: date,
-            type: type,
-            category: category
-        )
+    func addTransaction(_ newTx: TransactionItem) {
         transactions.append(newTx)
         saveTransactions()
     }

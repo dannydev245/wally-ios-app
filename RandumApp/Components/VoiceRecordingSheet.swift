@@ -12,7 +12,7 @@ struct VoiceRecordingSheet: View {
     @EnvironmentObject private var themeManager: ThemeManager
     @StateObject private var speechRecognizer = SpeechRecognizer()
     
-    var onParsedSuccessfully: (ParsedTransactionResult) -> Void
+    var onParsedSuccessfully: (TransactionItem) -> Void
     
     @State private var parsingError: String? = nil
     

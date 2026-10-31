@@ -13,7 +13,7 @@ struct ReceiptScannerSheet: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var themeManager: ThemeManager
     
-    var onScanCompleted: (ParsedTransactionResult) -> Void
+    var onScanCompleted: (TransactionItem) -> Void
     
     @State private var isProcessing: Bool = false
     @State private var selectedPhotoItem: PhotosPickerItem? = nil
