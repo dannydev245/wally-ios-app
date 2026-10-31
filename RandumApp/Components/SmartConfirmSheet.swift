@@ -14,6 +14,13 @@ struct SmartConfirmSheet: View {
     @State var parsedResult: TransactionItem
     var onConfirm: (TransactionItem) -> Void
     
+    private var isFormValid: Bool {
+        let isTitleValid = !parsedResult.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        let isAmountValid = parsedResult.amount > 0
+        let isDateValid = parsedResult.date <= Date()
+        return isTitleValid && isAmountValid && isDateValid
+    }
+    
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
@@ -49,7 +56,7 @@ struct SmartConfirmSheet: View {
                             .font(.subheadline)
                             .foregroundStyle(AppColors.textSecondary)
                         Spacer()
-                        TextField("Title", text: $parsedResult.title)
+                        TextField("Enter Title", text: $parsedResult.title)
                             .multilineTextAlignment(.trailing)
                             .fontWeight(.medium)
                     }
@@ -85,7 +92,7 @@ struct SmartConfirmSheet: View {
                         DatePicker(
                             "",
                             selection: $parsedResult.date,
-                            in: ...Date(), // Chặn ngày tương lai
+                            in: ...Date(),
                             displayedComponents: [.date]
                         )
                         .datePickerStyle(.compact)
@@ -117,8 +124,13 @@ struct SmartConfirmSheet: View {
                 
                 // Nút Xác nhận Lưu
                 Button {
+                    guard isFormValid else { return }
                     UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                    onConfirm(parsedResult)
+                    
+                    var finalItem = parsedResult
+                    finalItem.title = finalItem.title.trimmingCharacters(in: .whitespacesAndNewlines)
+                    
+                    onConfirm(finalItem)
                     dismiss()
                 } label: {
                     Text("Confirm & Save")
@@ -131,6 +143,7 @@ struct SmartConfirmSheet: View {
                                 .fill(themeManager.currentAccent.primaryColor)
                         )
                 }
+                .disabled(!isFormValid)
             }
             .padding()
             .toolbar {

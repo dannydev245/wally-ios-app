@@ -114,6 +114,7 @@ struct VoiceRecordingSheet: View {
     private func processTranscript(_ text: String) {
         guard !text.trimmingCharacters(in: .whitespaces).isEmpty else { return }
         
+//        print(text)
         let result = VoiceTransactionParser.parse(text: text)
         
         if result.amount > 0 {

@@ -30,7 +30,7 @@ struct OCRTextMatcher {
             .replacingOccurrences(of: "d", with: "", options: .caseInsensitive)
             .trimmingCharacters(in: .whitespacesAndNewlines)
         
-        let pattern = #"(\d{1,3}(?:[\.,]\d{3})+(?:[\.,]\d+)?|\d+)"#
+        let pattern = #"(\d{1,3}(?:[\.,]\d{3})+(?:[\.,]\d+)?|\d+(?:[\.,]\d{1,2})?)"#
         guard let regex = try? NSRegularExpression(pattern: pattern) else { return nil }
         
         let nsString = cleanText as NSString
@@ -42,20 +42,28 @@ struct OCRTextMatcher {
             let dotParts = numberString.components(separatedBy: ".")
             let commaParts = numberString.components(separatedBy: ",")
             
+            // Nhận diện phân cách hàng nghìn kiểu VN (10.000) hay kiểu Mỹ (10,000.00)
             if dotParts.count > 1 && dotParts.dropFirst().allSatisfy({ $0.count == 3 }) {
                 numberString = numberString.replacingOccurrences(of: ".", with: "")
             } else if commaParts.count > 1 && commaParts.dropFirst().allSatisfy({ $0.count == 3 }) {
                 numberString = numberString.replacingOccurrences(of: ",", with: "")
             } else {
+                // Thay dấu phẩy thập phân thành chấm
                 numberString = numberString.replacingOccurrences(of: ",", with: ".")
             }
             
             let digitsOnly = numberString.filter { $0.isNumber }
-            // Bỏ qua mã hóa đơn / số tài khoản dài >= 10 số
             if digitsOnly.count >= 10 { continue }
             
-            if let val = Double(numberString), val >= 1_000 && val <= 200_000_000 {
-                return val
+            if let val = Double(numberString) {
+                // Loại trừ năm (ví dụ 2017, 2024, 2025, 2026...) khi đứng một mình
+                if val >= 2000 && val <= 2035 && !numberString.contains(".") {
+                    continue
+                }
+                // Cho phép từ 0.5 (cho USD) đến 500,000,000 (cho VND)
+                if val >= 0.5 && val <= 500_000_000 {
+                    return val
+                }
             }
         }
         return nil
@@ -63,10 +71,11 @@ struct OCRTextMatcher {
     
     // MARK: - Date Parser (EN & VI)
     static func extractDate(from lines: [String]) -> Date? {
-        let dateKeywords = ["thoi gian", "ngay", "date", "time", "trans date", "created at"]
+        let dateKeywords = ["thoi gian", "ngay", "date", "time", "trans date", "created at", "check closed"]
         let datePattern = #"(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})"#
         guard let regex = try? NSRegularExpression(pattern: datePattern) else { return nil }
         
+        // Ưu tiên dòng có chứa từ khóa liên quan đến ngày tháng
         for line in lines {
             let norm = removeAccents(from: line.lowercased())
             if dateKeywords.contains(where: { norm.contains($0) }) {
@@ -74,6 +83,7 @@ struct OCRTextMatcher {
             }
         }
         
+        // Quét toàn bộ các dòng còn lại
         for line in lines {
             let norm = removeAccents(from: line.lowercased())
             if isDateNoise(norm) { continue }
@@ -88,14 +98,29 @@ struct OCRTextMatcher {
         guard let match = regex.firstMatch(in: text, options: [], range: NSRange(location: 0, length: nsString.length)) else {
             return nil
         }
-        let dayStr = nsString.substring(with: match.range(at: 1))
-        let monthStr = nsString.substring(with: match.range(at: 2))
-        let yearStr = nsString.substring(with: match.range(at: 3))
+        
+        let part1 = Int(nsString.substring(with: match.range(at: 1))) ?? 0
+        let part2 = Int(nsString.substring(with: match.range(at: 2))) ?? 0
+        let year = nsString.substring(with: match.range(at: 3))
         
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd/MM/yyyy"
         formatter.locale = Locale(identifier: "en_US_POSIX")
-        return formatter.date(from: "\(dayStr)/\(monthStr)/\(yearStr)")
+        
+        // Nếu phần tử thứ 2 > 12 -> chắc chắn là MM/dd/yyyy (Ví dụ: 01/30/2017)
+        if part2 > 12 && part1 <= 12 {
+            formatter.dateFormat = "MM/dd/yyyy"
+            return formatter.date(from: "\(part1)/\(part2)/\(year)")
+        }
+        
+        // Mặc định thử dd/MM/yyyy trước
+        formatter.dateFormat = "dd/MM/yyyy"
+        if let date = formatter.date(from: "\(part1)/\(part2)/\(year)") {
+            return date
+        }
+        
+        // Fallback sang MM/dd/yyyy
+        formatter.dateFormat = "MM/dd/yyyy"
+        return formatter.date(from: "\(part1)/\(part2)/\(year)")
     }
     
     // MARK: - Category Detector (EN & VI)
@@ -185,7 +210,7 @@ struct OCRTextMatcher {
     
     private static func isDateNoise(_ normLine: String) -> Bool {
         return normLine.contains("diem") || normLine.contains("point") ||
-               normLine.contains("sdt") || normLine.contains("tel") ||
-               normLine.contains("ft") || normLine.contains("ref")
+        normLine.contains("sdt") || normLine.contains("tel") ||
+        normLine.contains("ft") || normLine.contains("ref")
     }
 }
